@@ -3,55 +3,55 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Thu Mar 30 15:54:18 2023 
+-- * Generation date: Thu Mar 30 18:37:04 2023 
 -- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
--- * Schema: camping_ddl/1-1-1 
+-- * Schema: code ddl/1-1-1 
 -- ********************************************* 
 
 
 -- Database Section
 -- ________________ 
 
-create database camping_ddl;
-use camping_ddl;
+create database code ddl;
+use code ddl;
 
 
 -- Tables Section
 -- _____________ 
 
-create table ACTIVITES (
-     Id_acti char(1) not null,
-     Date char(1) not null,
-     Heure char(1) not null,
-     Lieu char(1) not null,
-     Type_acti varchar(1) not null,
-     Id_Pers char(1) not null,
-     constraint ID_ACTIVITES_ID primary key (Id_acti));
+create table ACTIVITE (
+     Id_acti int not null,
+     Date date not null,
+     Heure varchar(250) not null,
+     Lieu varchar(250) not null,
+     Id_type_acti int not null,
+     Id_anim int not null,
+     constraint ID_ACTIVITE_ID primary key (Id_acti));
 
 create table ADMINISTRATION (
-     Id_Pers char(1) not null,
-     Id_admin char(1) not null,
-     constraint SID_ADMINISTRATION_ID unique (Id_admin),
-     constraint FKSTA_ADM_ID primary key (Id_Pers));
+     Id_admin int not null,
+     Id_staff int not null,
+     constraint ID_ADMINISTRATION_ID primary key (Id_admin),
+     constraint FKSTA_ADM_ID unique (Id_staff));
 
 create table ANIMATEUR (
-     Id_Pers char(1) not null,
-     Id_anim char(1) not null,
-     constraint SID_ANIMATEUR_ID unique (Id_anim),
-     constraint FKSTA_ANI_ID primary key (Id_Pers));
+     Id_anim int not null,
+     Id_staff int not null,
+     constraint ID_ANIMATEUR_ID primary key (Id_anim),
+     constraint FKSTA_ANI_ID unique (Id_staff));
 
 create table CLIENT (
-     Id_Pers char(1) not null,
-     Id_cli char(1) not null,
-     Pays char(1) not null,
-     Code_postal char(1) not null,
-     Ville char(1) not null,
-     Numero_de_maison char(1) not null,
-     Con_Email char(1) not null,
-     Con_Telephone char(1) not null,
-     Id_equipe char(1),
-     constraint SID_CLIENT_ID unique (Id_cli),
-     constraint FKPER_CLI_ID primary key (Id_Pers));
+     Id_cli int not null,
+     Id_Pers int not null,
+     Pays varchar(250) not null,
+     Code_postal int not null,
+     Ville varchar(250) not null,
+     Numero_de_maison int not null,
+     Con_Email varchar(250) not null,
+     Con_Telephone int not null,
+     Id_equipe int,
+     constraint ID_CLIENT_ID primary key (Id_cli),
+     constraint FKPER_CLI_ID unique (Id_Pers));
 
 create table COMPTA_TOURNOI_VIEW (
      Id_feuille_compta char(1) not null,
@@ -61,165 +61,173 @@ create table COMPTA_TOURNOI_VIEW (
      Prix_acti char(1) not null,
      constraint ID_COMPTA_TOURNOI_VIEW_ID primary key (Id_feuille_compta));
 
-create table cuisine_pour (
-     Id_Pers char(1) not null,
-     Id_emplacement char(1) not null,
-     Id_tournoi char(1) not null,
-     constraint ID_cuisine_pour_ID primary key (Id_emplacement, Id_tournoi, Id_Pers));
+create table cuisine (
+     Id_cuis int not null,
+     Id_emplacement int not null,
+     Id_tournoi int not null,
+     constraint ID_cuisine_ID primary key (Id_emplacement, Id_tournoi, Id_cuis));
 
 create table CUISINIER (
-     Id_Pers char(1) not null,
-     Id_cuis char(1) not null,
-     constraint SID_CUISINIER_ID unique (Id_cuis),
-     constraint FKSTA_CUI_ID primary key (Id_Pers));
+     Id_cuis int not null,
+     Id_staff int not null,
+     constraint ID_CUISINIER_ID primary key (Id_cuis),
+     constraint FKSTA_CUI_ID unique (Id_staff));
 
 create table EMPLACEMENT (
-     Id_emplacement char(1) not null,
-     Type char(1) not null,
+     Id_emplacement int not null,
+     Type varchar(250) not null,
      Occupation char not null,
-     Prix int not null,
+     Prix float(1) not null,
      bbq char not null,
      nbr_places int not null,
      acces_eau char not null,
      constraint ID_EMPLACEMENT_ID primary key (Id_emplacement));
 
+create table FICHE_COMPTA (
+     Id_fiche_compta int not null,
+     Date date not null,
+     Prix_total float(1) not null,
+     constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
+
 create table EQUIPE (
-     Id_equipe char(1) not null,
-     Nom char(1) not null,
-     Nbr_pers char(1) not null,
+     Id_equipe int not null,
+     Nom varchar(250) not null,
+     Nbr_pers int not null,
      constraint ID_EQUIPE_ID primary key (Id_equipe));
 
-create table gere (
-     Id_Pers char(1) not null,
-     Id_mat char(1) not null,
-     constraint ID_gere_ID primary key (Id_Pers, Id_mat));
-
-create table inscription (
-     Id_acti char(1) not null,
-     Id_Pers char(1) not null,
-     constraint ID_inscription_ID primary key (Id_acti, Id_Pers));
-
-create table loue_emplacement (
-     Id_Pers char(1) not null,
-     Id_emplacement char(1) not null,
-     Date_debut char(1) not null,
-     Date_fin char(1) not null,
-     constraint ID_loue_emplacement_ID primary key (Id_emplacement, Id_Pers));
-
-create table Loue_mat (
-     Id_Pers char(1) not null,
-     Id_mat char(1) not null,
-     Date_loc char(1) not null,
-     constraint ID_Loue_mat_ID primary key (Id_mat, Id_Pers));
-
 create table MATERIEL (
-     Id_mat char(1) not null,
-     Nom char(1) not null,
-     Type char(1) not null,
-     Prix char(1) not null,
-     Etat char(1) not null,
+     Id_mat int not null,
+     Nom varchar(250) not null,
+     Type varchar(250) not null,
+     Prix int not null,
+     Etat varchar(250) not null,
      constraint ID_MATERIEL_ID primary key (Id_mat));
 
-create table NETTOIE (
-     Id_Pers char(1) not null,
-     Date char(1) not null,
-     Heure char(1) not null,
-     Id_secteur char(1) not null,
-     constraint ID_NETTOIE_ID primary key (Id_Pers, Heure, Date));
-
-create table participe (
-     Id_equipe char(1) not null,
-     Id_tournoi char(1) not null,
-     constraint ID_participe_ID primary key (Id_tournoi, Id_equipe));
-
 create table PERSONNE (
-     Nom char(1) not null,
-     Age char(1) not null,
-     Id_Pers char(1) not null,
-     STAFF char(1),
-     CLIENT char(1),
+     Nom varchar(250) not null,
+     Age int not null,
+     Id_Pers int not null,
+     STAFF int,
+     CLIENT int,
      constraint ID_PERSONNE_ID primary key (Id_Pers));
 
-create table peut_faire (
-     Id_Pers char(1) not null,
-     Type_acti varchar(1) not null,
-     constraint ID_peut_faire_ID primary key (Type_acti, Id_Pers));
-
-create table Prenom (
-     Id_Pers char(1) not null,
-     Prenom char(1) not null,
-     constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
-
 create table SECTEUR (
-     Id_secteur char(1) not null,
-     Nom char(1) not null,
+     Id_secteur int not null,
+     Nom varchar(250) not null,
      constraint ID_SECTEUR_ID primary key (Id_secteur));
 
 create table STAFF (
-     Id_Pers char(1) not null,
-     Id_staff char(1) not null,
-     Prix char(1) not null,
-     Prix_chef char(1),
-     Chef_ char(1),
-     TECHNICIEN char(1),
-     CUISINIER char(1),
-     ANIMATEUR char(1),
-     ADMINISTRATION char(1),
-     constraint SID_STAFF_ID unique (Id_staff),
-     constraint FKPER_STA_ID primary key (Id_Pers));
+     Id_staff int not null,
+     Id_Pers int not null,
+     Prix float(1) not null,
+     Prix_chef float(1),
+     TECHNICIEN int,
+     CUISINIER int,
+     ANIMATEUR int,
+     ADMINISTRATION int,
+     Chef_ int,
+     constraint ID_STAFF_ID primary key (Id_staff),
+     constraint FKPER_STA_ID unique (Id_Pers));
 
 create table TECHNICIEN (
-     Id_Pers char(1) not null,
-     Id_tech char(1) not null,
-     constraint SID_TECHNICIEN_ID unique (Id_tech),
-     constraint FKSTA_TEC_ID primary key (Id_Pers));
+     Id_tech int not null,
+     Id_staff int not null,
+     constraint ID_TECHNICIEN_ID primary key (Id_tech),
+     constraint FKSTA_TEC_ID unique (Id_staff));
 
 create table TOURNOI (
-     Id_tournoi char(1) not null,
-     Id_acti char(1) not null,
-     Date char(1) not null,
-     Lieu char(1) not null,
-     Prix char(1) not null,
+     Id_tournoi int not null,
+     Id_acti int not null,
+     Date date not null,
+     Lieu varchar(250) not null,
+     Prix float(1) not null,
      constraint ID_TOURNOI_ID primary key (Id_tournoi),
      constraint FKde_ID unique (Id_acti));
 
 create table TYPE_ACTI (
-     Type_acti varchar(1) not null,
-     Prix int not null,
+     Id_type_acti int not null,
+     Prix float(1) not null,
      Taille_min_ int not null comment 'en cm',
      Age_min int not null,
-     Nom varchar(1) not null,
-     constraint ID_TYPE_ACTI_ID primary key (Type_acti));
+     Nom varchar(250) not null,
+     constraint ID_TYPE_ACTI_ID primary key (Id_type_acti));
+
+create table gere (
+     Id_admin int not null,
+     Type_de_Gestion_1__1 int,
+     Type_de_Gestion_1_ int,
+     constraint ID_gere_1_ID primary key (Id_admin, Type_de_Gestion_1_),
+     constraint ID_gere_ID primary key (Id_admin, Type_de_Gestion_1__1));
+
+create table inscription (
+     Id_acti int not null,
+     Id_cli int not null,
+     constraint ID_inscription_ID primary key (Id_acti, Id_cli));
+
+create table loue_emplacement (
+     Id_cli int not null,
+     Id_emplacement int not null,
+     Date_debut date not null,
+     Date_fin date not null,
+     constraint ID_loue_emplacement_ID primary key (Id_emplacement, Id_cli));
+
+create table Loue_mat (
+     Id_cli int not null,
+     Id_mat int not null,
+     Date_loc date not null,
+     constraint ID_Loue_mat_ID primary key (Id_mat, Id_cli));
+
+create table NETTOIE (
+     Id_tech int not null,
+     Date date not null,
+     Heure varchar(250) not null,
+     Id_secteur int not null,
+     constraint ID_NETTOIE_ID primary key (Id_tech, Heure, Date));
+
+create table participe (
+     Id_equipe int not null,
+     Id_tournoi int not null,
+     constraint ID_participe_ID primary key (Id_tournoi, Id_equipe));
+
+create table peut_faire (
+     Id_anim int not null,
+     Id_type_acti int not null,
+     constraint ID_peut_faire_ID primary key (Id_type_acti, Id_anim));
+
+create table Prenom (
+     Id_Pers int not null,
+     Prenom varchar(250) not null,
+     constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
 
 
 -- Constraints Section
 -- ___________________ 
 
-alter table ACTIVITES add constraint FKde__FK
-     foreign key (Type_acti)
-     references TYPE_ACTI (Type_acti);
+alter table ACTIVITE add constraint FKde__FK
+     foreign key (Id_type_acti)
+     references TYPE_ACTI (Id_type_acti);
 
-alter table ACTIVITES add constraint FKanime_FK
-     foreign key (Id_Pers)
-     references ANIMATEUR (Id_Pers);
+alter table ACTIVITE add constraint FKanime_FK
+     foreign key (Id_anim)
+     references ANIMATEUR (Id_anim);
 
 alter table ADMINISTRATION add constraint FKSTA_ADM_FK
-     foreign key (Id_Pers)
-     references STAFF (Id_Pers);
+     foreign key (Id_staff)
+     references STAFF (Id_staff);
 
 -- Not implemented
--- alter table ANIMATEUR add constraint FKSTA_ANI_CHK
+-- alter table ANIMATEUR add constraint ID_ANIMATEUR_CHK
 --     check(exists(select * from peut_faire
---                  where peut_faire.Id_Pers = Id_Pers)); 
+--                  where peut_faire.Id_anim = Id_anim)); 
 
 alter table ANIMATEUR add constraint FKSTA_ANI_FK
-     foreign key (Id_Pers)
-     references STAFF (Id_Pers);
+     foreign key (Id_staff)
+     references STAFF (Id_staff);
 
 -- Not implemented
--- alter table CLIENT add constraint FKPER_CLI_CHK
+-- alter table CLIENT add constraint ID_CLIENT_CHK
 --     check(exists(select * from loue_emplacement
---                  where loue_emplacement.Id_Pers = Id_Pers)); 
+--                  where loue_emplacement.Id_cli = Id_cli)); 
 
 alter table CLIENT add constraint FKPER_CLI_FK
      foreign key (Id_Pers)
@@ -229,69 +237,36 @@ alter table CLIENT add constraint FKfait_partie_FK
      foreign key (Id_equipe)
      references EQUIPE (Id_equipe);
 
-alter table cuisine_pour add constraint FKcui_TOU_FK
+alter table cuisine add constraint FKcui_TOU_FK
      foreign key (Id_tournoi)
      references TOURNOI (Id_tournoi);
 
-alter table cuisine_pour add constraint FKcui_EMP
+alter table cuisine add constraint FKcui_EMP
      foreign key (Id_emplacement)
      references EMPLACEMENT (Id_emplacement);
 
-alter table cuisine_pour add constraint FKcui_CUI_FK
-     foreign key (Id_Pers)
-     references CUISINIER (Id_Pers);
+alter table cuisine add constraint FKcui_CUI_FK
+     foreign key (Id_cuis)
+     references CUISINIER (Id_cuis);
 
 alter table CUISINIER add constraint FKSTA_CUI_FK
-     foreign key (Id_Pers)
-     references STAFF (Id_Pers);
+     foreign key (Id_staff)
+     references STAFF (Id_staff);
 
-alter table gere add constraint FKger_MAT_FK
-     foreign key (Id_mat)
-     references MATERIEL (Id_mat);
+-- Not implemented
+-- alter table FICHE_COMPTA add constraint ID_FICHE_COMPTA_CHK
+--     check(exists(select * from gere
+--                  where gere.Type_de_Gestion_1_ = Id_fiche_compta)); 
 
-alter table gere add constraint FKger_ADM
-     foreign key (Id_Pers)
-     references ADMINISTRATION (Id_Pers);
+-- Not implemented
+-- alter table EQUIPE add constraint ID_EQUIPE_CHK
+--     check(exists(select * from CLIENT
+--                  where CLIENT.Id_equipe = Id_equipe)); 
 
-alter table inscription add constraint FKins_CLI_FK
-     foreign key (Id_Pers)
-     references CLIENT (Id_Pers);
-
-alter table inscription add constraint FKins_ACT
-     foreign key (Id_acti)
-     references ACTIVITES (Id_acti);
-
-alter table loue_emplacement add constraint FKlou_EMP
-     foreign key (Id_emplacement)
-     references EMPLACEMENT (Id_emplacement);
-
-alter table loue_emplacement add constraint FKlou_CLI_1_FK
-     foreign key (Id_Pers)
-     references CLIENT (Id_Pers);
-
-alter table Loue_mat add constraint FKLou_MAT
-     foreign key (Id_mat)
-     references MATERIEL (Id_mat);
-
-alter table Loue_mat add constraint FKLou_CLI_FK
-     foreign key (Id_Pers)
-     references CLIENT (Id_Pers);
-
-alter table NETTOIE add constraint FKNET_SEC_FK
-     foreign key (Id_secteur)
-     references SECTEUR (Id_secteur);
-
-alter table NETTOIE add constraint FKNET_TEC
-     foreign key (Id_Pers)
-     references TECHNICIEN (Id_Pers);
-
-alter table participe add constraint FKpar_TOU
-     foreign key (Id_tournoi)
-     references TOURNOI (Id_tournoi);
-
-alter table participe add constraint FKpar_EQU_FK
-     foreign key (Id_equipe)
-     references EQUIPE (Id_equipe);
+-- Not implemented
+-- alter table MATERIEL add constraint ID_MATERIEL_CHK
+--     check(exists(select * from gere
+--                  where gere.Type_de_Gestion_1__1 = Id_mat)); 
 
 -- Not implemented
 -- alter table PERSONNE add constraint ID_PERSONNE_CHK
@@ -300,18 +275,6 @@ alter table participe add constraint FKpar_EQU_FK
 
 alter table PERSONNE add constraint LSTONE_PERSONNE
      check(STAFF is not null or CLIENT is not null); 
-
-alter table peut_faire add constraint FKpeu_TYP
-     foreign key (Type_acti)
-     references TYPE_ACTI (Type_acti);
-
-alter table peut_faire add constraint FKpeu_ANI_FK
-     foreign key (Id_Pers)
-     references ANIMATEUR (Id_Pers);
-
-alter table Prenom add constraint FKPER_Pre
-     foreign key (Id_Pers)
-     references PERSONNE (Id_Pers);
 
 alter table STAFF add constraint EXTONE_STAFF_1
      check((Prix_chef is not null)); 
@@ -328,11 +291,11 @@ alter table STAFF add constraint FKPER_STA_FK
 
 alter table STAFF add constraint FKdirige_FK
      foreign key (Chef_)
-     references STAFF (Id_Pers);
+     references STAFF (Id_staff);
 
 alter table TECHNICIEN add constraint FKSTA_TEC_FK
-     foreign key (Id_Pers)
-     references STAFF (Id_Pers);
+     foreign key (Id_staff)
+     references STAFF (Id_staff);
 
 -- Not implemented
 -- alter table TOURNOI add constraint ID_TOURNOI_CHK
@@ -341,39 +304,107 @@ alter table TECHNICIEN add constraint FKSTA_TEC_FK
 
 alter table TOURNOI add constraint FKde_FK
      foreign key (Id_acti)
-     references ACTIVITES (Id_acti);
+     references ACTIVITE (Id_acti);
 
 -- Not implemented
 -- alter table TYPE_ACTI add constraint ID_TYPE_ACTI_CHK
 --     check(exists(select * from peut_faire
---                  where peut_faire.Type_acti = Type_acti)); 
+--                  where peut_faire.Id_type_acti = Id_type_acti)); 
+
+alter table gere add constraint EXTONE_gere
+     check((Type_de_Gestion_1__1 is not null and Type_de_Gestion_1_ is null)
+           or (Type_de_Gestion_1__1 is null and Type_de_Gestion_1_ is not null)); 
+
+alter table gere add constraint FKType_de_Gestion2_FK
+     foreign key (Type_de_Gestion_1_)
+     references FICHE_COMPTA (Id_fiche_compta);
+
+alter table gere add constraint FKType_de_Gestion1_FK
+     foreign key (Type_de_Gestion_1__1)
+     references MATERIEL (Id_mat);
+
+alter table gere add constraint FKger_ADM
+     foreign key (Id_admin)
+     references ADMINISTRATION (Id_admin);
+
+alter table inscription add constraint FKins_CLI_FK
+     foreign key (Id_cli)
+     references CLIENT (Id_cli);
+
+alter table inscription add constraint FKins_ACT
+     foreign key (Id_acti)
+     references ACTIVITE (Id_acti);
+
+alter table loue_emplacement add constraint FKlou_EMP
+     foreign key (Id_emplacement)
+     references EMPLACEMENT (Id_emplacement);
+
+alter table loue_emplacement add constraint FKlou_CLI_1_FK
+     foreign key (Id_cli)
+     references CLIENT (Id_cli);
+
+alter table Loue_mat add constraint FKLou_MAT
+     foreign key (Id_mat)
+     references MATERIEL (Id_mat);
+
+alter table Loue_mat add constraint FKLou_CLI_FK
+     foreign key (Id_cli)
+     references CLIENT (Id_cli);
+
+alter table NETTOIE add constraint FKNET_TEC
+     foreign key (Id_tech)
+     references TECHNICIEN (Id_tech);
+
+alter table NETTOIE add constraint FKNET_SEC_FK
+     foreign key (Id_secteur)
+     references SECTEUR (Id_secteur);
+
+alter table participe add constraint FKpar_TOU
+     foreign key (Id_tournoi)
+     references TOURNOI (Id_tournoi);
+
+alter table participe add constraint FKpar_EQU_FK
+     foreign key (Id_equipe)
+     references EQUIPE (Id_equipe);
+
+alter table peut_faire add constraint FKpeu_TYP
+     foreign key (Id_type_acti)
+     references TYPE_ACTI (Id_type_acti);
+
+alter table peut_faire add constraint FKpeu_ANI_FK
+     foreign key (Id_anim)
+     references ANIMATEUR (Id_anim);
+
+alter table Prenom add constraint FKPER_Pre
+     foreign key (Id_Pers)
+     references PERSONNE (Id_Pers);
 
 
 -- Index Section
 -- _____________ 
 
-create unique index ID_ACTIVITES_IND
-     on ACTIVITES (Id_acti);
+create unique index ID_ACTIVITE_IND
+     on ACTIVITE (Id_acti);
 
 create index FKde__IND
-     on ACTIVITES (Type_acti);
+     on ACTIVITE (Id_type_acti);
 
 create index FKanime_IND
-     on ACTIVITES (Id_Pers);
+     on ACTIVITE (Id_anim);
 
-create unique index SID_ADMINISTRATION_IND
+create unique index ID_ADMINISTRATION_IND
      on ADMINISTRATION (Id_admin);
 
 create unique index FKSTA_ADM_IND
-     on ADMINISTRATION (Id_Pers);
+     on ADMINISTRATION (Id_staff);
 
-create unique index SID_ANIMATEUR_IND
+create unique index ID_ANIMATEUR_IND
      on ANIMATEUR (Id_anim);
 
 create unique index FKSTA_ANI_IND
-     on ANIMATEUR (Id_Pers);
+     on ANIMATEUR (Id_staff);
 
-create unique index SID_CLIENT_IND
+create unique index ID_CLIENT_IND
      on CLIENT (Id_cli);
 
 create unique index FKPER_CLI_IND
@@ -385,56 +416,95 @@ create index FKfait_partie_IND
 create unique index ID_COMPTA_TOURNOI_VIEW_IND
      on COMPTA_TOURNOI_VIEW (Id_feuille_compta);
 
-create unique index ID_cuisine_pour_IND
-     on cuisine_pour (Id_emplacement, Id_tournoi, Id_Pers);
+create unique index ID_cuisine_IND
+     on cuisine (Id_emplacement, Id_tournoi, Id_cuis);
 
 create index FKcui_TOU_IND
-     on cuisine_pour (Id_tournoi);
+     on cuisine (Id_tournoi);
 
 create index FKcui_CUI_IND
-     on cuisine_pour (Id_Pers);
+     on cuisine (Id_cuis);
 
-create unique index SID_CUISINIER_IND
+create unique index ID_CUISINIER_IND
      on CUISINIER (Id_cuis);
 
 create unique index FKSTA_CUI_IND
-     on CUISINIER (Id_Pers);
+     on CUISINIER (Id_staff);
 
 create unique index ID_EMPLACEMENT_IND
      on EMPLACEMENT (Id_emplacement);
 
+create unique index ID_FICHE_COMPTA_IND
+     on FICHE_COMPTA (Id_fiche_compta);
+
 create unique index ID_EQUIPE_IND
      on EQUIPE (Id_equipe);
-
-create unique index ID_gere_IND
-     on gere (Id_Pers, Id_mat);
-
-create index FKger_MAT_IND
-     on gere (Id_mat);
-
-create unique index ID_inscription_IND
-     on inscription (Id_acti, Id_Pers);
-
-create index FKins_CLI_IND
-     on inscription (Id_Pers);
-
-create unique index ID_loue_emplacement_IND
-     on loue_emplacement (Id_emplacement, Id_Pers);
-
-create index FKlou_CLI_1_IND
-     on loue_emplacement (Id_Pers);
-
-create unique index ID_Loue_mat_IND
-     on Loue_mat (Id_mat, Id_Pers);
-
-create index FKLou_CLI_IND
-     on Loue_mat (Id_Pers);
 
 create unique index ID_MATERIEL_IND
      on MATERIEL (Id_mat);
 
+create unique index ID_PERSONNE_IND
+     on PERSONNE (Id_Pers);
+
+create unique index ID_SECTEUR_IND
+     on SECTEUR (Id_secteur);
+
+create unique index ID_STAFF_IND
+     on STAFF (Id_staff);
+
+create unique index FKPER_STA_IND
+     on STAFF (Id_Pers);
+
+create index FKdirige_IND
+     on STAFF (Chef_);
+
+create unique index ID_TECHNICIEN_IND
+     on TECHNICIEN (Id_tech);
+
+create unique index FKSTA_TEC_IND
+     on TECHNICIEN (Id_staff);
+
+create unique index ID_TOURNOI_IND
+     on TOURNOI (Id_tournoi);
+
+create unique index FKde_IND
+     on TOURNOI (Id_acti);
+
+create unique index ID_TYPE_ACTI_IND
+     on TYPE_ACTI (Id_type_acti);
+
+create unique index ID_gere_1_IND
+     on gere (Id_admin, Type_de_Gestion_1_);
+
+create unique index ID_gere_IND
+     on gere (Id_admin, Type_de_Gestion_1__1);
+
+create index FKType_de_Gestion2_IND
+     on gere (Type_de_Gestion_1_);
+
+create index FKType_de_Gestion1_IND
+     on gere (Type_de_Gestion_1__1);
+
+create unique index ID_inscription_IND
+     on inscription (Id_acti, Id_cli);
+
+create index FKins_CLI_IND
+     on inscription (Id_cli);
+
+create unique index ID_loue_emplacement_IND
+     on loue_emplacement (Id_emplacement, Id_cli);
+
+create index FKlou_CLI_1_IND
+     on loue_emplacement (Id_cli);
+
+create unique index ID_Loue_mat_IND
+     on Loue_mat (Id_mat, Id_cli);
+
+create index FKLou_CLI_IND
+     on Loue_mat (Id_cli);
+
 create unique index ID_NETTOIE_IND
-     on NETTOIE (Id_Pers, Heure, Date);
+     on NETTOIE (Id_tech, Heure, Date);
 
 create index FKNET_SEC_IND
      on NETTOIE (Id_secteur);
@@ -445,42 +515,12 @@ create unique index ID_participe_IND
 create index FKpar_EQU_IND
      on participe (Id_equipe);
 
-create unique index ID_PERSONNE_IND
-     on PERSONNE (Id_Pers);
-
 create unique index ID_peut_faire_IND
-     on peut_faire (Type_acti, Id_Pers);
+     on peut_faire (Id_type_acti, Id_anim);
 
 create index FKpeu_ANI_IND
-     on peut_faire (Id_Pers);
+     on peut_faire (Id_anim);
 
 create unique index ID_Prenom_IND
      on Prenom (Id_Pers, Prenom);
-
-create unique index ID_SECTEUR_IND
-     on SECTEUR (Id_secteur);
-
-create unique index SID_STAFF_IND
-     on STAFF (Id_staff);
-
-create unique index FKPER_STA_IND
-     on STAFF (Id_Pers);
-
-create index FKdirige_IND
-     on STAFF (Chef_);
-
-create unique index SID_TECHNICIEN_IND
-     on TECHNICIEN (Id_tech);
-
-create unique index FKSTA_TEC_IND
-     on TECHNICIEN (Id_Pers);
-
-create unique index ID_TOURNOI_IND
-     on TOURNOI (Id_tournoi);
-
-create unique index FKde_IND
-     on TOURNOI (Id_acti);
-
-create unique index ID_TYPE_ACTI_IND
-     on TYPE_ACTI (Type_acti);
 
