@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:latest
+    ports: 
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=mdpbidon123
+      - MYSQL_DATABASE=camping_physique
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin 
+    volumes:
+      - "./data.sql:/docker-entrypoint-initdb.d/1.sql"
+

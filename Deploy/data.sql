@@ -12,8 +12,8 @@
 -- Database Section
 -- ________________ 
 
-create database camping_physique;
-use camping_physique;
+-- create database camping_physique;
+-- use camping_physique;
 
 
 -- Tables Section
