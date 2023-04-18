@@ -1,0 +1,83 @@
+Triggers :
+
+3 triggers cycliques
+
+ou
+
+2 triggers cycliques
++
+trigger qui vérifie Prix > 0
+
+Vues :
+
+Profil d'un utilisateur :
+
+table Personne + (
+
+Si client :
+
+	table client
+	+activités auxquelles il est incris
+	+tournois inscris
+	+role
+
+si staff :
+	table staff
+	+sous-type staff
+	+chef 
+
+	Si cuisinier :
+	+ tournois dans lesquels il cuisine
+	+emplacements dans lesquels il cuisine
+	
+
+	Si animateur :
+	Nom de l'acti qu'il peut faire
+	+les actis qu'ils donnent
+
+	Si technicien : 
+	table nettoie
+
+	Si admin :
+	matériel
+	consulter la compta
+
+Si Chef :
+	-vue team : les staffs sous ses ordres
+)
+
+
+
+
+-----------------------------
+
+Vue compta :
+	toutes les rentrées d'argent de chaque mois pour une année
+	cad :
+		 Prix total qui contient :
+			-PrixMatériel (positif)
+			-Prix staff (négatif)
+			-PrixChef (négatif)
+			-PrixEmplacement (positif)
+			-PrixAtcivité (positif)
+			-PrixTournoi (positif)
+-------------------------------
+
+Vue ListeActis :
+	-Sélectionner tous les noms de type_acti
+
+Application : 
+
+register()
+login()
+->profile()
+->userProfile(Id_pers) pour les admins
+->rent_bengalow()
+->InscriptionActivity()
+->rentMaterial()
+->inscriptionTournament()
+->checkCompta() pour les admins
+->fire() un chef de section renvoie quelqun de sa section
+->delete_user(Id_Pers) pour les admins et un admin ne peut pas en supprimer un autre
+->check_temas() : apelle la vue team -> un chef consulte son équipe
+->checkActis() : renvoie la vue listeActis

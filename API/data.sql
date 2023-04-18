@@ -96,7 +96,7 @@ create table gere (
      Type_de_Gestion_1__1 int,
      Type_de_Gestion_1_ int,
      constraint ID_gere_1_ID primary key (Id_admin, Type_de_Gestion_1_),
-     constraint ID_gere_ID primary key (Id_admin, Type_de_Gestion_1__1));
+     constraint ID_gere_ID secondary key (Id_admin, Type_de_Gestion_1__1));
 
 LOCK TABLES `gere` WRITE;
 INSERT INTO `gere` VALUES (1,1,1);
