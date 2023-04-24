@@ -3,8 +3,8 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Sat Apr  1 13:45:21 2023 
--- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
+-- * Generation date: Mon Apr 24 11:43:17 2023 
+-- * LUN file: C:\Users\esteb\OneDrive\Bureau\Projet-BD-main\Schémas\Camping-era.lun 
 -- * Schema: camping_physique/1-1 
 -- ********************************************* 
 
@@ -136,6 +136,7 @@ create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
      Id_Pers int not null,
+     Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
      constraint ID_PERSONNE_ID primary key (Id_Pers));

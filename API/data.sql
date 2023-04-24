@@ -3,8 +3,8 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Sat Apr  1 13:45:21 2023 
--- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
+-- * Generation date: Mon Apr 24 11:43:17 2023 
+-- * LUN file: C:\Users\esteb\OneDrive\Bureau\Projet-BD-main\Schémas\Camping-era.lun 
 -- * Schema: camping_physique/1-1 
 -- ********************************************* 
 
@@ -12,8 +12,8 @@
 -- Database Section
 -- ________________ 
 
--- create database camping_physique;
--- use camping_physique;
+create database camping_physique;
+use camping_physique;
 
 
 -- Tables Section
@@ -87,20 +87,12 @@ create table FICHE_COMPTA (
      Prix_total float(1) not null,
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
 
-LOCK TABLES `FICHE_COMPTA` WRITE;
-INSERT INTO `FICHE_COMPTA` VALUES (1,'2021-01-01',1.0);
-UNLOCK TABLES
-
 create table gere (
      Id_admin int not null,
      Type_de_Gestion_1__1 int,
      Type_de_Gestion_1_ int,
      constraint ID_gere_1_ID primary key (Id_admin, Type_de_Gestion_1_),
-     constraint ID_gere_ID secondary key (Id_admin, Type_de_Gestion_1__1));
-
-LOCK TABLES `gere` WRITE;
-INSERT INTO `gere` VALUES (1,1,1);
-UNLOCK TABLES
+     constraint ID_gere_ID primary key (Id_admin, Type_de_Gestion_1__1));
 
 create table inscription (
      Id_acti int not null,
@@ -144,6 +136,7 @@ create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
      Id_Pers int not null,
+     Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
      constraint ID_PERSONNE_ID primary key (Id_Pers));
