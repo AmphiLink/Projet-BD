@@ -81,3 +81,12 @@ login()
 ->delete_user(Id_Pers) pour les admins et un admin ne peut pas en supprimer un autre
 ->check_temas() : apelle la vue team -> un chef consulte son équipe
 ->checkActis() : renvoie la vue listeActis
+
+
+Questions Pol Benats : 
+
+-Triggers ok ?
+-Table prénoms - personne ?
+-problème avec la table gère
+-structure d'un projet en python
+-Problème inserion de données
