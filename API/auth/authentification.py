@@ -16,8 +16,9 @@ def login(cnx):
             UserName = input("Entrez votre nom de famille")
             PasswordLogin = input("Entrez votre mot de passe")
             queryLogin = (
-                "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = {}".format(UserName))
+                "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = '{}'".format(UserName))
             myCursor.execute(queryLogin)
+            myCursor.fetchall()
             resolve = verify_password(PasswordLogin, myCursor)
             if not resolve:
                 print("Mauvais mot de passe ou nom. Veuillez réessayer")
@@ -38,26 +39,30 @@ def login(cnx):
         Password = input("Entrez votre mot de passe ? ")
         HashToSend = hash_password(Password)
 
-        queryUser = ("INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES({}, {}, {})". format(
+        queryUser = ("INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES('{}', '{}', '{}')". format(
             UserName, int(UserAge), HashToSend))
         myCursor.execute(queryUser)
         cnx.commit()
         # on récupère l'id du client que l'on vient de créer
-        queryId = ("SELECT Id_pers FROM PERSONNE WHERE Nom = {}".format(UserName))
+        queryId = (
+            "SELECT Id_pers FROM PERSONNE WHERE Nom = '{}'".format(UserName))
         myCursor.execute(queryId)
+        myCursor.fetchall()
 
+        MyCursorName = cnx.cursor()
         for name in UserSurnameList:
             querySurname = (
-                "INSERT INTO Prenom (id, Prenom) VALUES({}, {})".format(myCursor, name))
-            myCursor.execute(querySurname)
+                "INSERT INTO Prenom (id, Prenom) VALUES('{}', '{}')".format(myCursor, name))
+            MyCursorName.execute(querySurname)
             cnx.commit()
 
-        myCursor = cnx.cursor()
         # On le met dans la table client
         if UserRole == "CLIENT":
-            queryRole = ("INSERT INTO CLIENT (Id) VALUES({})".format(myCursor))
+            queryRole = (
+                "INSERT INTO CLIENT (Id) VALUES('{}')".format(myCursor))
         else:
-            queryRole = ("INSERT INTO STAFF (Id) VALUES({})".format(myCursor))
+            queryRole = (
+                "INSERT INTO STAFF (Id) VALUES('{}')".format(myCursor))
         myCursor.execute(queryRole)
         cnx.commit()
 

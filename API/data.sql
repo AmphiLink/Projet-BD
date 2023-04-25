@@ -20,7 +20,7 @@
 -- _____________ 
 
 create table ACTIVITE (
-     Id_acti int not null,
+     Id_acti int not null AUTO_INCREMENT,
      Date date not null,
      Heure varchar(250) not null,
      Lieu varchar(250) not null,
@@ -41,7 +41,7 @@ create table ANIMATEUR (
      constraint FKSTA_ANI_ID unique (Id_staff));
 
 create table CLIENT (
-     Id_cli int not null,
+     Id_cli int not null AUTO_INCREMENT,
      Id_Pers int not null,
      Pays varchar(250) not null,
      Code_postal int not null,
@@ -66,7 +66,7 @@ create table CUISINIER (
      constraint FKSTA_CUI_ID unique (Id_staff));
 
 create table EMPLACEMENT (
-     Id_emplacement int not null,
+     Id_emplacement int not null AUTO_INCREMENT,
      Type varchar(250) not null,
      Occupation char not null,
      Prix float(1) not null,
@@ -76,13 +76,13 @@ create table EMPLACEMENT (
      constraint ID_EMPLACEMENT_ID primary key (Id_emplacement));
 
 create table EQUIPE (
-     Id_equipe int not null,
+     Id_equipe int not null AUTO_INCREMENT,
      Nom varchar(250) not null,
      Nbr_pers int not null,
      constraint ID_EQUIPE_ID primary key (Id_equipe));
 
 create table FICHE_COMPTA (
-     Id_fiche_compta int not null,
+     Id_fiche_compta int not null AUTO_INCREMENT,
      Date date not null,
      Prix_total float(1) not null,
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
@@ -113,7 +113,7 @@ create table Loue_mat (
      constraint ID_Loue_mat_ID primary key (Id_mat, Id_cli));
 
 create table MATERIEL (
-     Id_mat int not null,
+     Id_mat int not null AUTO_INCREMENT,
      Nom varchar(250) not null,
      Type varchar(250) not null,
      Prix int not null,
@@ -135,7 +135,7 @@ create table participe (
 create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
-     Id_Pers int not null,
+     Id_Pers int not null AUTO_INCREMENT,
      Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
@@ -152,7 +152,7 @@ create table Prenom (
      constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
 
 create table SECTEUR (
-     Id_secteur int not null,
+     Id_secteur int not null AUTO_INCREMENT,
      Nom varchar(250) not null,
      constraint ID_SECTEUR_ID primary key (Id_secteur));
 
@@ -176,7 +176,7 @@ create table TECHNICIEN (
      constraint FKSTA_TEC_ID unique (Id_staff));
 
 create table TOURNOI (
-     Id_tournoi int not null,
+     Id_tournoi int not null AUTO_INCREMENT,
      Id_acti int not null,
      Date date not null,
      Lieu varchar(250) not null,
@@ -185,7 +185,7 @@ create table TOURNOI (
      constraint FKde_ID unique (Id_acti));
 
 create table TYPE_ACTI (
-     Id_type_acti int not null,
+     Id_type_acti int not null AUTO_INCREMENT,
      Prix float(1) not null,
      Taille_min_ int not null comment 'en cm',
      Age_min int not null,
