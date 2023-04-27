@@ -3,8 +3,8 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Mon Apr 24 11:43:17 2023 
--- * LUN file: C:\Users\esteb\OneDrive\Bureau\Projet-BD-main\Schémas\Camping-era.lun 
+-- * Generation date: Thu Apr 27 12:45:23 2023 
+-- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
 -- * Schema: camping_physique/1-1 
 -- ********************************************* 
 
@@ -13,7 +13,7 @@
 -- ________________ 
 
 -- create database camping_physique;
--- use camping_physique;
+use camping_physique;
 
 
 -- Tables Section
@@ -67,7 +67,7 @@ create table CUISINIER (
 
 create table EMPLACEMENT (
      Id_emplacement int not null AUTO_INCREMENT,
-     Type varchar(250) not null,
+     Type_emplacement varchar(250) not null,
      Occupation char not null,
      Prix float(1) not null,
      bbq char not null,
@@ -83,16 +83,10 @@ create table EQUIPE (
 
 create table FICHE_COMPTA (
      Id_fiche_compta int not null AUTO_INCREMENT,
-     Date date not null,
+     Date_fiche date not null,
      Prix_total float(1) not null,
+     Id_admin int not null,
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
-
--- create table gere (
---      Id_admin int not null,
---      Type_de_Gestion_1__1 int,
---      Type_de_Gestion_1_ int,
---      constraint ID_gere_1_ID primary key (Id_admin, Type_de_Gestion_1_),
---      constraint ID_gere_ID primary key (Id_admin, Type_de_Gestion_1__1));
 
 create table inscription (
      Id_acti int not null,
@@ -118,6 +112,7 @@ create table MATERIEL (
      Type varchar(250) not null,
      Prix int not null,
      Etat varchar(250) not null,
+     Id_admin int not null,
      constraint ID_MATERIEL_ID primary key (Id_mat));
 
 create table NETTOIE (
@@ -135,7 +130,7 @@ create table participe (
 create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
-     Id_Pers int not null  AUTO_INCREMENT,
+     Id_Pers int not null AUTO_INCREMENT,
      Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
@@ -251,24 +246,7 @@ alter table CUISINIER add constraint FKSTA_CUI_FK
 --     check(exists(select * from CLIENT
 --                  where CLIENT.Id_equipe = Id_equipe)); 
 
--- Not implemented
--- alter table FICHE_COMPTA add constraint ID_FICHE_COMPTA_CHK
---     check(exists(select * from gere
---                  where gere.Type_de_Gestion_1_ = Id_fiche_compta)); 
-
-alter table gere add constraint EXTONE_gere
-     check((Type_de_Gestion_1__1 is not null and Type_de_Gestion_1_ is null)
-           or (Type_de_Gestion_1__1 is null and Type_de_Gestion_1_ is not null)); 
-
-alter table gere add constraint FKType_de_Gestion2_FK
-     foreign key (Type_de_Gestion_1_)
-     references FICHE_COMPTA (Id_fiche_compta);
-
-alter table gere add constraint FKType_de_Gestion1_FK
-     foreign key (Type_de_Gestion_1__1)
-     references MATERIEL (Id_mat);
-
-alter table gere add constraint FKger_ADM
+alter table FICHE_COMPTA add constraint FKgere2_FK
      foreign key (Id_admin)
      references ADMINISTRATION (Id_admin);
 
@@ -296,10 +274,9 @@ alter table Loue_mat add constraint FKLou_CLI_FK
      foreign key (Id_cli)
      references CLIENT (Id_cli);
 
--- Not implemented
--- alter table MATERIEL add constraint ID_MATERIEL_CHK
---     check(exists(select * from gere
---                  where gere.Type_de_Gestion_1__1 = Id_mat)); 
+alter table MATERIEL add constraint FKgere1_FK
+     foreign key (Id_admin)
+     references ADMINISTRATION (Id_admin);
 
 alter table NETTOIE add constraint FKNET_TEC
      foreign key (Id_tech)
@@ -322,8 +299,8 @@ alter table participe add constraint FKpar_EQU_FK
 --     check(exists(select * from Prenom
 --                  where Prenom.Id_Pers = Id_Pers)); 
 
-alter table PERSONNE add constraint LSTONE_PERSONNE
-     check(STAFF is not null or CLIENT is not null); 
+-- alter table PERSONNE add constraint LSTONE_PERSONNE
+--      check(STAFF is not null or CLIENT is not null); 
 
 alter table peut_faire add constraint FKpeu_TYP
      foreign key (Id_type_acti)
@@ -337,15 +314,15 @@ alter table Prenom add constraint FKPER_Pre
      foreign key (Id_Pers)
      references PERSONNE (Id_Pers);
 
-alter table STAFF add constraint EXTONE_STAFF_1
-     check((Employe_ is not null and Prix_chef is null)
-           or (Employe_ is null and Prix_chef is not null)); 
+-- alter table STAFF add constraint EXTONE_STAFF_1
+--      check((Employe_ is not null and Prix_chef is null)
+--            or (Employe_ is null and Prix_chef is not null)); 
 
-alter table STAFF add constraint EXTONE_STAFF
-     check((TECHNICIEN is not null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is null)
-           or (TECHNICIEN is null and ADMINISTRATION is not null and CUISINIER is null and ANIMATEUR is null)
-           or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is not null and ANIMATEUR is null)
-           or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is not null)); 
+-- alter table STAFF add constraint EXTONE_STAFF
+--      check((TECHNICIEN is not null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is null)
+--            or (TECHNICIEN is null and ADMINISTRATION is not null and CUISINIER is null and ANIMATEUR is null)
+--            or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is not null and ANIMATEUR is null)
+--            or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is not null)); 
 
 alter table STAFF add constraint FKPER_STA_FK
      foreign key (Id_Pers)
@@ -431,17 +408,8 @@ create unique index ID_EQUIPE_IND
 create unique index ID_FICHE_COMPTA_IND
      on FICHE_COMPTA (Id_fiche_compta);
 
-create unique index ID_gere_1_IND
-     on gere (Id_admin, Type_de_Gestion_1_);
-
-create unique index ID_gere_IND
-     on gere (Id_admin, Type_de_Gestion_1__1);
-
-create index FKType_de_Gestion2_IND
-     on gere (Type_de_Gestion_1_);
-
-create index FKType_de_Gestion1_IND
-     on gere (Type_de_Gestion_1__1);
+create index FKgere2_IND
+     on FICHE_COMPTA (Id_admin);
 
 create unique index ID_inscription_IND
      on inscription (Id_acti, Id_cli);
@@ -463,6 +431,9 @@ create index FKLou_CLI_IND
 
 create unique index ID_MATERIEL_IND
      on MATERIEL (Id_mat);
+
+create index FKgere1_IND
+     on MATERIEL (Id_admin);
 
 create unique index ID_NETTOIE_IND
      on NETTOIE (Id_tech, Heure, Date);

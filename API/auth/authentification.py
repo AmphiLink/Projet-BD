@@ -86,7 +86,6 @@ def userRegister(cnx, myCursor):
 
 
 def staffRegister(cnx, myCursor):
-    Cursor = cnx.cursor()
     UserJob = "nothing"
     print("\nVous vous êtes enregistré en tant que staff dans notre camping veuillez entrer ces informations supplémentaires :\n")
     while UserJob not in ("TECHNICIEN", "CUISINIER", "ANIMATEUR", "ADMINISTRATION"):
@@ -102,20 +101,15 @@ def staffRegister(cnx, myCursor):
         UserPrice = 3000
     queryStaff = ("INSERT INTO STAFF (Id_Pers, Prix) VALUES('{}', '{}')".format(
         myCursor.lastrowid, UserPrice))
-    Cursor.execute(queryStaff)
+    myCursor.execute(queryStaff)
     cnx.commit()
-    Cursor = cnx.cursor()
     queryIdStaff = (
         "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(myCursor.lastrowid))
-    Cursor.execute(queryIdStaff)
-    Cursor.fetchall()
-    if Cursor.lastrowid == None:
-        queryJob = ("INSERT INTO {} (Id_staff) VALUES('{}')".format(
-            UserJob, 1))
-    else:
-        queryJob = ("INSERT INTO {} (Id_staff) VALUES('{}')".format(
-            UserJob, Cursor.lastrowid))
-    Cursor.execute(queryJob)
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+    queryJob = ("INSERT INTO {} (Id_staff) VALUES('{}')".format(
+        UserJob, myCursor.lastrowid))
+    myCursor.execute(queryJob)
     cnx.commit()
     print("\nVous êtes enregistré en tant que staff ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte\n")
     login(cnx)
