@@ -23,9 +23,13 @@ def main_auth(cnx, Authorized):
 def login(cnx, Authorized):
     while Authorized != True:
         myCursor = cnx.cursor()
+        # On crée une liste contenant le nom et l'age de l'utilisateur
+
         UserInfosListe = input(
             "Entrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
         PasswordLogin = input("Entrez votre mot de passe ")
+
+        # On teste le mot de passe rentré par cet utilisateur
         queryLogin = (
             "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = '{}' AND Age = '{}'".format(UserInfosListe[0], UserInfosListe[1]))
         myCursor.execute(queryLogin)
@@ -36,7 +40,69 @@ def login(cnx, Authorized):
         else:
             print("Vous êtes connectés !")
             Authorized = True
-    return Authorized
+
+    queryId = ("SELECT Id_Pers FROM PERSONNE WHERE Nom = '{}' AND Age = '{}'".format(
+        UserInfosListe[0], UserInfosListe[1]))
+    myCursor.execute(queryId)
+    myCursor.fetchall()
+
+    chef_state = False
+    user_state = "Client"
+
+    # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
+    queryChef = ("SELECT Prix_chef FROM STAFF WHERE Id_Pers = '{}'".format(
+        myCursor.lastrowid))
+    myCursor.execute(queryChef)
+    myCursor.fetchall()
+
+    # On vérifie si Prix_chef n'est pas nul
+    if myCursor.rowcount != 0:
+        chef_state = True
+
+    # on récupère l'IdStaff de l'utilisateur
+    myCursor.execute(queryId)
+    myCursor.fetchall()
+    # On récupère le rôle de l'utilisateur
+    queryIdStaff = (
+        "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(myCursor.lastrowid))
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+    queryAdmin = ("SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ADMINISTRATION)".format(
+        myCursor.lastrowid))
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+    queryCuisinier = (
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM CUISINIER)".format(myCursor.lastrowid))
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+    queryAnimateur = (
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ANIMATEUR)".format(myCursor.lastrowid))
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+    queryTechnicien = (
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)".format(myCursor.lastrowid))
+
+    myCursor.execute(queryAdmin)
+    myCursor.fetchall()
+    if myCursor.rowcount != 0:
+        user_state = "Admin"
+
+    myCursor.execute(queryCuisinier)
+    myCursor.fetchall()
+    if myCursor.rowcount != 0:
+        user_state = "Cuisinier"
+
+    myCursor.execute(queryAnimateur)
+    myCursor.fetchall()
+    if myCursor.rowcount != 0:
+        user_state = "Animateur"
+
+    myCursor.execute(queryTechnicien)
+    myCursor.fetchall()
+    if myCursor.rowcount != 0:
+        user_state = "Technicien"
+
+    return chef_state, user_state
 
 
 def register(cnx, Authorized):

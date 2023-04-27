@@ -22,7 +22,7 @@ Si client :
 	+role
 
 si staff :
-	table staff
+	table staff :
 	+sous-type staff
 	+chef 
 
