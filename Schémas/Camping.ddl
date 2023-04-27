@@ -3,8 +3,8 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Mon Apr 24 11:43:17 2023 
--- * LUN file: C:\Users\esteb\OneDrive\Bureau\Projet-BD-main\Schémas\Camping-era.lun 
+-- * Generation date: Tue Apr 25 14:26:42 2023 
+-- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
 -- * Schema: camping_physique/1-1 
 -- ********************************************* 
 
@@ -85,14 +85,8 @@ create table FICHE_COMPTA (
      Id_fiche_compta int not null,
      Date date not null,
      Prix_total float(1) not null,
-     constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
-
-create table gere (
      Id_admin int not null,
-     Type_de_Gestion_1__1 int,
-     Type_de_Gestion_1_ int,
-     constraint ID_gere_1_ID primary key (Id_admin, Type_de_Gestion_1_),
-     constraint ID_gere_ID primary key (Id_admin, Type_de_Gestion_1__1));
+     constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
 
 create table inscription (
      Id_acti int not null,
@@ -118,6 +112,7 @@ create table MATERIEL (
      Type varchar(250) not null,
      Prix int not null,
      Etat varchar(250) not null,
+     Id_admin int not null,
      constraint ID_MATERIEL_ID primary key (Id_mat));
 
 create table NETTOIE (
@@ -251,24 +246,7 @@ alter table CUISINIER add constraint FKSTA_CUI_FK
 --     check(exists(select * from CLIENT
 --                  where CLIENT.Id_equipe = Id_equipe)); 
 
--- Not implemented
--- alter table FICHE_COMPTA add constraint ID_FICHE_COMPTA_CHK
---     check(exists(select * from gere
---                  where gere.Type_de_Gestion_1_ = Id_fiche_compta)); 
-
-alter table gere add constraint EXTONE_gere
-     check((Type_de_Gestion_1__1 is not null and Type_de_Gestion_1_ is null)
-           or (Type_de_Gestion_1__1 is null and Type_de_Gestion_1_ is not null)); 
-
-alter table gere add constraint FKType_de_Gestion2_FK
-     foreign key (Type_de_Gestion_1_)
-     references FICHE_COMPTA (Id_fiche_compta);
-
-alter table gere add constraint FKType_de_Gestion1_FK
-     foreign key (Type_de_Gestion_1__1)
-     references MATERIEL (Id_mat);
-
-alter table gere add constraint FKger_ADM
+alter table FICHE_COMPTA add constraint FKgere2_FK
      foreign key (Id_admin)
      references ADMINISTRATION (Id_admin);
 
@@ -296,10 +274,9 @@ alter table Loue_mat add constraint FKLou_CLI_FK
      foreign key (Id_cli)
      references CLIENT (Id_cli);
 
--- Not implemented
--- alter table MATERIEL add constraint ID_MATERIEL_CHK
---     check(exists(select * from gere
---                  where gere.Type_de_Gestion_1__1 = Id_mat)); 
+alter table MATERIEL add constraint FKgere1_FK
+     foreign key (Id_admin)
+     references ADMINISTRATION (Id_admin);
 
 alter table NETTOIE add constraint FKNET_TEC
      foreign key (Id_tech)
@@ -431,17 +408,8 @@ create unique index ID_EQUIPE_IND
 create unique index ID_FICHE_COMPTA_IND
      on FICHE_COMPTA (Id_fiche_compta);
 
-create unique index ID_gere_1_IND
-     on gere (Id_admin, Type_de_Gestion_1_);
-
-create unique index ID_gere_IND
-     on gere (Id_admin, Type_de_Gestion_1__1);
-
-create index FKType_de_Gestion2_IND
-     on gere (Type_de_Gestion_1_);
-
-create index FKType_de_Gestion1_IND
-     on gere (Type_de_Gestion_1__1);
+create index FKgere2_IND
+     on FICHE_COMPTA (Id_admin);
 
 create unique index ID_inscription_IND
      on inscription (Id_acti, Id_cli);
@@ -463,6 +431,9 @@ create index FKLou_CLI_IND
 
 create unique index ID_MATERIEL_IND
      on MATERIEL (Id_mat);
+
+create index FKgere1_IND
+     on MATERIEL (Id_admin);
 
 create unique index ID_NETTOIE_IND
      on NETTOIE (Id_tech, Heure, Date);

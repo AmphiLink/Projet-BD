@@ -32,8 +32,9 @@ def verify_password(password, hashed_password):
     Returns:
         bool: True if the password matches the hashed password, False otherwise.
     """
+    really_hashed_password = hashed_password[0][0]
     # Check if the provided password matches the hashed password
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+    return bcrypt.checkpw(password.encode('utf-8'), really_hashed_password.encode('utf-8'))
 
 # ####################
 # ##    REGISTER    ##

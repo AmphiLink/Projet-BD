@@ -29,13 +29,13 @@ create table ACTIVITE (
      constraint ID_ACTIVITE_ID primary key (Id_acti));
 
 create table ADMINISTRATION (
-     Id_admin int not null,
+     Id_admin int not null AUTO_INCREMENT,
      Id_staff int not null,
      constraint ID_ADMINISTRATION_ID primary key (Id_admin),
      constraint FKSTA_ADM_ID unique (Id_staff));
 
 create table ANIMATEUR (
-     Id_anim int not null,
+     Id_anim int not null AUTO_INCREMENT,
      Id_staff int not null,
      constraint ID_ANIMATEUR_ID primary key (Id_anim),
      constraint FKSTA_ANI_ID unique (Id_staff));
@@ -60,7 +60,7 @@ create table cuisine (
      constraint ID_cuisine_ID primary key (Id_emplacement, Id_tournoi, Id_cuis));
 
 create table CUISINIER (
-     Id_cuis int not null,
+     Id_cuis int not null AUTO_INCREMENT,
      Id_staff int not null,
      constraint ID_CUISINIER_ID primary key (Id_cuis),
      constraint FKSTA_CUI_ID unique (Id_staff));
@@ -135,7 +135,7 @@ create table participe (
 create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
-     Id_Pers int not null AUTO_INCREMENT,
+     Id_Pers int not null  AUTO_INCREMENT,
      Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
@@ -152,12 +152,12 @@ create table Prenom (
      constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
 
 create table SECTEUR (
-     Id_secteur int not null AUTO_INCREMENT,
+     Id_secteur int not null,
      Nom varchar(250) not null,
      constraint ID_SECTEUR_ID primary key (Id_secteur));
 
 create table STAFF (
-     Id_staff int not null,
+     Id_staff int not null AUTO_INCREMENT,
      Id_Pers int not null,
      Prix float(1) not null,
      Prix_chef float(1),
@@ -170,7 +170,7 @@ create table STAFF (
      constraint FKPER_STA_ID unique (Id_Pers));
 
 create table TECHNICIEN (
-     Id_tech int not null,
+     Id_tech int not null AUTO_INCREMENT,
      Id_staff int not null,
      constraint ID_TECHNICIEN_ID primary key (Id_tech),
      constraint FKSTA_TEC_ID unique (Id_staff));
