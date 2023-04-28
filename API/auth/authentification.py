@@ -51,7 +51,7 @@ def login(cnx, Authorized):
 
     # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
     queryChef = ("SELECT Prix_chef FROM STAFF WHERE Id_Pers = '{}'".format(
-        myCursor.lastrowid))
+        myCursor))
     myCursor.execute(queryChef)
     myCursor.fetchall()
 
@@ -62,45 +62,56 @@ def login(cnx, Authorized):
     # on récupère l'IdStaff de l'utilisateur
     myCursor.execute(queryId)
     myCursor.fetchall()
-    # On récupère le rôle de l'utilisateur
+
+    # On vérifie si l'utilisateur est un admin, un cuisinier, un animateur ou un technicien
     queryIdStaff = (
-        "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(myCursor.lastrowid))
-    myCursor.execute(queryIdStaff)
-    myCursor.fetchall()
+        "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(myCursor))
+
     queryAdmin = ("SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ADMINISTRATION)".format(
-        myCursor.lastrowid))
-    myCursor.execute(queryIdStaff)
-    myCursor.fetchall()
+        myCursor))
+
     queryCuisinier = (
-        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM CUISINIER)".format(myCursor.lastrowid))
-    myCursor.execute(queryIdStaff)
-    myCursor.fetchall()
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM CUISINIER)".format(myCursor))
+
     queryAnimateur = (
-        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ANIMATEUR)".format(myCursor.lastrowid))
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ANIMATEUR)".format(myCursor))
+
+    queryTechnicien = (
+        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)".format(myCursor))
+
     myCursor.execute(queryIdStaff)
     myCursor.fetchall()
-    queryTechnicien = (
-        "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)".format(myCursor.lastrowid))
 
     myCursor.execute(queryAdmin)
     myCursor.fetchall()
     if myCursor.rowcount != 0:
         user_state = "Admin"
 
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+
     myCursor.execute(queryCuisinier)
     myCursor.fetchall()
     if myCursor.rowcount != 0:
         user_state = "Cuisinier"
+
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
 
     myCursor.execute(queryAnimateur)
     myCursor.fetchall()
     if myCursor.rowcount != 0:
         user_state = "Animateur"
 
+    myCursor.execute(queryIdStaff)
+    myCursor.fetchall()
+
     myCursor.execute(queryTechnicien)
     myCursor.fetchall()
     if myCursor.rowcount != 0:
         user_state = "Technicien"
+
+    print(chef_state, user_state)
 
     return chef_state, user_state
 
