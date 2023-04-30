@@ -3,16 +3,30 @@ from time import sleep
 from mysql.connector import (connection)
 
 
-def main_auth(cnx, Authorized):
+def main_auth(cnx):
+    """
+    Cette fonction apelle les fonctions login et register en fonction de la demande de l'utilisateur.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+
+    Returns:
+    --------
+    Authorized : Il contient les variables suivantes :
+    chef_state : True si l'utilisateur est un chef, False sinon (bool)
+    user_state : le job de l'utilisateur (str)
+    Id_Pers : L'id de l'utilisateur dans la base de données(table PERSONNE) (int)
+    """
     Connexion_type = "nothing"
     while Connexion_type not in ("login", "register", "exit"):
         Connexion_type = input(
             "Entrez 'login'.Vous n'avez pas de compte ? Entrez 'register'\n")
         sleep(1)
     if Connexion_type == "login":
-        Authorized = login(cnx, Authorized)
+        Authorized = login(cnx)
     elif Connexion_type == "register":
-        register(cnx, Authorized)
+        register(cnx)
     else:
         print("\nVous avez quitté l'application")
         sleep(1)
@@ -20,7 +34,21 @@ def main_auth(cnx, Authorized):
     return Authorized
 
 
-def login(cnx, Authorized):
+def login(cnx):
+    """
+    Permet à l'utilisateur de se connecter à l'application.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+
+    Returns:
+    --------
+    Authorized : Il contient les variables suivantes :
+    chef_state : True si l'utilisateur est un chef, False sinon (bool)
+    user_state : le job de l'utilisateur (str)
+    Id_Pers : L'id de l'utilisateur dans la base de données(table PERSONNE) (int)
+    """
     while Authorized != True:
         myCursor = cnx.cursor(prepared=True)
 
@@ -44,11 +72,12 @@ def login(cnx, Authorized):
     myCursor = cnx.cursor(prepared=True)
     queryId = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s  AND Age = %s"
     myCursor.execute(queryId, (UserInfosListe[0], UserInfosListe[1]))
+
     # On récupère l'Id_Pers de l'utilisateur que l'on met dans une variable
     Id_Pers = myCursor.fetchall()[0][0]
 
     chef_state = False
-    user_state = "Client"
+    user_state = "CLIENT"
 
     # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
     queryChef = "SELECT Prix_chef FROM STAFF WHERE Id_Pers = %s"
@@ -74,32 +103,41 @@ def login(cnx, Authorized):
 
         queryTechnicien = "SELECT Id_staff FROM STAFF WHERE Id_staff = %s AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)"
 
+        # Si la query Admin n'est pas vide alors l'utilisateur est un admin
         myCursor.execute(queryAdmin, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
-            user_state = "Admin"
+            user_state = "ADMINISTRATION"
 
+        # Si la query Cuisinier n'est pas vide alors l'utilisateur est un cuisinier
         myCursor.execute(queryCuisinier, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
-            user_state = "Cuisinier"
+            user_state = "CUISINIER"
 
+        # Si la query Animateur n'est pas vide alors l'utilisateur est un animateur
         myCursor.execute(queryAnimateur, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
-            user_state = "Animateur"
+            user_state = "ANIMATEUR"
 
+        # Si la query Technicien n'est pas vide alors l'utilisateur est un technicien
         myCursor.execute(queryTechnicien, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
-            user_state = "Technicien"
+            user_state = "TECHNICIEN"
 
-    print(chef_state, user_state)
-
-    return chef_state, user_state
+    return chef_state, user_state, Id_Pers
 
 
-def register(cnx, Authorized):
+def register(cnx):
+    """
+    Permet à l'utilisateur de s'inscrire à l'application en tant que Client ou membre du staff.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+    """
     myCursor = cnx.cursor(prepared=True)
     UserName = input("Quel est votre nom ? ")
     UserSurname = input("Quel est votre.vos prénom.s ? ")
@@ -129,12 +167,20 @@ def register(cnx, Authorized):
 
     # On le met dans la table client
     if UserRole == "CLIENT":
-        userRegister(cnx, myCursor, Authorized)
+        userRegister(cnx, myCursor)
     else:
-        staffRegister(cnx, myCursor, Authorized)
+        staffRegister(cnx, myCursor)
 
 
-def userRegister(cnx, myCursor, Authorized):
+def userRegister(cnx, myCursor):
+    """
+    Permet à un client d'enregistrer ses informations suplémentaires.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+    myCursor : mysql.connector.connection_cext.CPreparedMySQLConnection (sa lastrowid contient celle du client enregistré précédemmment donc elle nous sera utile) (Object)
+    """
     Cursor = cnx.cursor(prepared=True)
     print("Vous vous êtes enregistré en tant que client dans notre camping veuillez entrer ces informations supplémentaires :")
     UserCountry = input("De quel pays venez vous ? ")
@@ -149,24 +195,26 @@ def userRegister(cnx, myCursor, Authorized):
                    UserCP, UserCity, UserHouseNumber, UserPhone, UserMail))
     cnx.commit()
     print("\nVous êtes enregistré en tant que client ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte")
-    main_auth(cnx, Authorized)
+    main_auth(cnx)
 
 
-def staffRegister(cnx, myCursor, Authorized):
+def staffRegister(cnx, myCursor):
+    """
+    Permet à un staff d'enregistrer ses informations suplémentaires.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+    myCursor : mysql.connector.connection_cext.CPreparedMySQLConnection (sa lastrowid contient celle du staff enregistré précédemmment donc elle nous sera utile) (Object)
+    """
+
     UserJob = "nothing"
     print("\nVous vous êtes enregistré en tant que staff dans notre camping veuillez entrer ces informations supplémentaires :\n")
     while UserJob not in ("TECHNICIEN", "CUISINIER", "ANIMATEUR", "ADMINISTRATION"):
         UserJob = input(
             "Quel est votre métier ? (TECHNICIEN, CUISINIER, ANIMATEUR ou ADMINISTRATION) ")
-    if UserJob == "TECHNICIEN":
-        UserPrice = 2000
-    elif UserJob == "CUISINIER":
-        UserPrice = 2200
-    elif UserJob == "ANIMATEUR":
-        UserPrice = 1700
-    else:
-        UserPrice = 3000
 
+    UserPrice = staffPrice(UserJob)
     # On rajoute un staff
     queryStaff = "INSERT INTO STAFF (Id_Pers, Prix) VALUES(%s, %s)"
     myCursor.execute(queryStaff, (myCursor.lastrowid, UserPrice))
@@ -196,4 +244,27 @@ def staffRegister(cnx, myCursor, Authorized):
             cnx.commit()
 
     print("\nVous êtes enregistré en tant que staff ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte\n")
-    main_auth(cnx, Authorized)
+    main_auth(cnx)
+
+
+def staffPrice(UserJob):
+    """
+    Cette fonction attribue un prix à un staff en fonction de son métier.
+
+    Parameters:
+    ----------
+    UserJob : Job du staff (String)
+
+    Returns:
+    -------
+    UserPrice : Prix du staff (Float)
+    """
+    if UserJob == "TECHNICIEN":
+        UserPrice = 2000
+    elif UserJob == "CUISINIER":
+        UserPrice = 2200
+    elif UserJob == "ANIMATEUR":
+        UserPrice = 1700
+    else:
+        UserPrice = 3000
+    return UserPrice

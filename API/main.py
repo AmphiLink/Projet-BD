@@ -1,22 +1,49 @@
 # Partie Deploy
 from auth.authentification import main_auth
 from roles.chef import main_chef
+from roles.admin import main_admin
+from roles.cuisinier import main_cuisinier
+from roles.animateur import main_animateur
+from roles.technicien import main_technicien
+from roles.client import main_client
 from __init__ import initialisation
+import os
 
 
 def main():
+    """
+    Cette fonction apelle toutes les autres fonctions de l'application.
+    """
+
+    # On initialise la connexion à la base de données
     cnx = initialisation()
     print("Bienvenue sur notre API Camping.\n")
-    chef_state, user_state = main_auth(cnx, Authorized=False)
 
+    # On récupère les informations de l'utilisateur connecté
+    # chef_state, user_state, Id_Pers = main_auth(cnx, Authorized=False)
+    chef_state = True
+    user_state = "ADMINISTRATION"
+    Id_Pers = 1
     if chef_state:
-        print("Vous êtes connecté en tant que '{}' et vous êtes chef.".format(
-            user_state))
+        os.system("cls")
+        print("Bienvenue dans la partie Chef de l'application !")
+        main_chef(user_state, cnx, Id_Pers)
     else:
-        print("Vous êtes connecté en tant que '{}'.".format(user_state))
-
-    if chef_state:
-        main_chef(user_state, cnx)
+        if user_state == "ADMINISTRATION":
+            print("Bienvenue dans la partie Admin de l'application !")
+            main_admin(cnx, Id_Pers)
+        elif user_state == "CUISINIER":
+            print("Bienvenue dans la partie Cuisinier de l'application !")
+            main_cuisinier(cnx, Id_Pers)
+        elif user_state == "ANIMATEUR":
+            print("Bienvenue dans la partie Animateur de l'application !")
+            main_animateur(cnx, Id_Pers)
+        elif user_state == "TECHNICIEN":
+            print("Bienvenue dans la partie Technicien de l'application !")
+            main_technicien(cnx, Id_Pers)
+        else:
+            print("Bienvenue dans la partie Client de l'application !")
+            main_client(cnx, Id_Pers)
 
     cnx.close()
 
