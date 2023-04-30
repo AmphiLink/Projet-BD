@@ -22,17 +22,17 @@ def main_auth(cnx, Authorized):
 
 def login(cnx, Authorized):
     while Authorized != True:
-        myCursor = cnx.cursor()
-        # On crée une liste contenant le nom et l'age de l'utilisateur
+        myCursor = cnx.cursor(prepared=True)
 
+        # On crée une liste contenant le nom et l'age de l'utilisateur
         UserInfosListe = input(
             "Entrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
         PasswordLogin = input("Entrez votre mot de passe ")
 
-        # On teste le mot de passe rentré par cet utilisateur
-        queryLogin = (
-            "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = '{}' AND Age = '{}'".format(UserInfosListe[0], UserInfosListe[1]))
-        myCursor.execute(queryLogin)
+        queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
+        myCursor.execute(queryLogin, (UserInfosListe[0], UserInfosListe[1]))
+
+        # On compare le password hashé au password entré par l'utilisateur
         resolve = verify_password(PasswordLogin, myCursor.fetchall())
         if not resolve:
             print("Mauvais mot de passe ou nom. Veuillez réessayer")
@@ -41,19 +41,18 @@ def login(cnx, Authorized):
             print("Vous êtes connectés !")
             Authorized = True
 
-    myCursor = cnx.cursor()
-    queryId = ("SELECT Id_Pers FROM PERSONNE WHERE Nom = '{}' AND Age = '{}'".format(
-        UserInfosListe[0], UserInfosListe[1]))
-    myCursor.execute(queryId)
+    myCursor = cnx.cursor(prepared=True)
+    queryId = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s  AND Age = %s"
+    myCursor.execute(queryId, (UserInfosListe[0], UserInfosListe[1]))
+    # On récupère l'Id_Pers de l'utilisateur que l'on met dans une variable
     Id_Pers = myCursor.fetchall()[0][0]
 
     chef_state = False
     user_state = "Client"
 
     # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
-    queryChef = ("SELECT Prix_chef FROM STAFF WHERE Id_Pers = '{}'".format(
-        Id_Pers))
-    myCursor.execute(queryChef)
+    queryChef = "SELECT Prix_chef FROM STAFF WHERE Id_Pers = %s"
+    myCursor.execute(queryChef, (Id_Pers,))
     myCursor.fetchall()
 
     # On vérifie si Prix_chef n'est pas nul
@@ -61,41 +60,36 @@ def login(cnx, Authorized):
         chef_state = True
 
     # on récupère l'IdStaff de l'utilisateur
-    queryIdStaff = (
-        "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(Id_Pers))
-    myCursor.execute(queryIdStaff)
+    queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
+    myCursor.execute(queryIdStaff, (Id_Pers,))
     if myCursor.with_rows:
         IdStaff = myCursor.fetchall()[0][0]
         # On vérifie si l'utilisateur est un admin, un cuisinier, un animateur ou un technicien
 
-        queryAdmin = ("SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ADMINISTRATION)".format(
-            IdStaff))
+        queryAdmin = "SELECT Id_staff FROM STAFF WHERE Id_staff = %s AND Id_staff in (SELECT Id_staff FROM ADMINISTRATION)"
 
-        queryCuisinier = (
-            "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM CUISINIER)".format(IdStaff))
+        queryCuisinier = "SELECT Id_staff FROM STAFF WHERE Id_staff = %s AND Id_staff in (SELECT Id_staff FROM CUISINIER)"
 
-        queryAnimateur = (
-            "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM ANIMATEUR)".format(IdStaff))
+        queryAnimateur = "SELECT Id_staff FROM STAFF WHERE Id_staff = %s AND Id_staff in (SELECT Id_staff FROM ANIMATEUR)"
 
-        queryTechnicien = (
-            "SELECT Id_staff FROM STAFF WHERE Id_staff = '{}' AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)".format(IdStaff))
+        queryTechnicien = "SELECT Id_staff FROM STAFF WHERE Id_staff = %s AND Id_staff in (SELECT Id_staff FROM TECHNICIEN)"
 
-        myCursor.execute(queryAdmin)
+        myCursor.execute(queryAdmin, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
             user_state = "Admin"
 
-        myCursor.execute(queryCuisinier)
+        myCursor.execute(queryCuisinier, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
             user_state = "Cuisinier"
 
-        myCursor.execute(queryAnimateur)
+        myCursor.execute(queryAnimateur, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
             user_state = "Animateur"
 
-        myCursor.execute(queryTechnicien)
+        myCursor.execute(queryTechnicien, (IdStaff,))
         myCursor.fetchall()
         if myCursor.rowcount != 0:
             user_state = "Technicien"
@@ -106,7 +100,7 @@ def login(cnx, Authorized):
 
 
 def register(cnx, Authorized):
-    myCursor = cnx.cursor()
+    myCursor = cnx.cursor(prepared=True)
     UserName = input("Quel est votre nom ? ")
     UserSurname = input("Quel est votre.vos prénom.s ? ")
     UserSurnameList = UserSurname.split(" ")
@@ -115,23 +109,22 @@ def register(cnx, Authorized):
     while UserRole not in ("STAFF", "CLIENT"):
         UserRole = input("Quel est votre rôle (STAFF ou CLIENT) ? ")
     Password = input("Entrez votre mot de passe ? ")
+    # On hash le mot de passe
     HashToSend = hash_password(Password)
 
-    queryUser = ("INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES('{}', '{}', '{}')". format(
-        UserName, int(UserAge), HashToSend))
-    myCursor.execute(queryUser)
+    queryUser = "INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES(%s, %s, %s)"
+    myCursor.execute(queryUser, (UserName, int(UserAge), HashToSend))
     cnx.commit()
     # on récupère l'id du client que l'on vient de créer
-    queryId = (
-        "SELECT Id_Pers FROM PERSONNE WHERE Nom = '{}' AND  Age = '{}' AND Mot_de_passe = '{}'".format(UserName, int(UserAge), HashToSend))
-    myCursor.execute(queryId)
+    queryId = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND  Age = %s AND Mot_de_passe = %s"
+    myCursor.execute(queryId, (UserName, int(UserAge), HashToSend))
     myCursor.fetchall()
 
-    MyCursorName = cnx.cursor()
+    MyCursorName = cnx.cursor(prepared=True)
+    # On insère tous les prénoms du Client dans la table Prenom
     for name in UserSurnameList:
-        querySurname = (
-            "INSERT INTO Prenom (Id_Pers, Prenom) VALUES('{}', '{}')".format(myCursor.lastrowid, name))
-        MyCursorName.execute(querySurname)
+        querySurname = "INSERT INTO Prenom (Id_Pers, Prenom) VALUES(%s, %s)"
+        MyCursorName.execute(querySurname, (myCursor.lastrowid, name))
         cnx.commit()
 
     # On le met dans la table client
@@ -142,7 +135,7 @@ def register(cnx, Authorized):
 
 
 def userRegister(cnx, myCursor, Authorized):
-    Cursor = cnx.cursor()
+    Cursor = cnx.cursor(prepared=True)
     print("Vous vous êtes enregistré en tant que client dans notre camping veuillez entrer ces informations supplémentaires :")
     UserCountry = input("De quel pays venez vous ? ")
     UserCP = input("Quel est votre code postal ? ")
@@ -150,9 +143,10 @@ def userRegister(cnx, myCursor, Authorized):
     UserHouseNumber = input("Quel est votre numéro de maison ? ")
     UserPhone = input("Quel est votre numéro de téléphone ? ")
     UserMail = input("Quel est votre adresse mail ? ")
-    queryCli = ("INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_telephone, Con_Email) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
-        myCursor.lastrowid, UserCountry, UserCP, UserCity, UserHouseNumber, UserPhone, UserMail))
-    Cursor.execute(queryCli)
+    queryCli = "INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_telephone, Con_Email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+    Cursor.execute(queryCli, (myCursor.lastrowid, UserCountry,
+                   UserCP, UserCity, UserHouseNumber, UserPhone, UserMail))
     cnx.commit()
     print("\nVous êtes enregistré en tant que client ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte")
     main_auth(cnx, Authorized)
@@ -174,21 +168,19 @@ def staffRegister(cnx, myCursor, Authorized):
         UserPrice = 3000
 
     # On rajoute un staff
-    queryStaff = ("INSERT INTO STAFF (Id_Pers, Prix) VALUES('{}', '{}')".format(
-        myCursor.lastrowid, UserPrice))
-    myCursor.execute(queryStaff)
+    queryStaff = "INSERT INTO STAFF (Id_Pers, Prix) VALUES(%s, %s)"
+    myCursor.execute(queryStaff, (myCursor.lastrowid, UserPrice))
     cnx.commit()
 
     # On récupère l'id du staff que l'on vient de créer
-    queryIdStaff = (
-        "SELECT Id_staff FROM STAFF WHERE Id_Pers = '{}'".format(myCursor.lastrowid))
-    myCursor.execute(queryIdStaff)
+    queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
+    myCursor.execute(queryIdStaff, (myCursor.lastrowid,))
     myCursor.fetchall()
 
     # On le met dans la table correspondant à son métier
-    queryJob = ("INSERT INTO {} (Id_staff) VALUES('{}')".format(
+    queryJob = "INSERT INTO %s (Id_staff) VALUES(%s)"
+    myCursor.execute(queryJob, (
         UserJob, myCursor.lastrowid))
-    myCursor.execute(queryJob)
     cnx.commit()
 
     # On lui demande si il est chef et on récupère de nouveau l'id_staff dans notre curseur
@@ -199,9 +191,8 @@ def staffRegister(cnx, myCursor, Authorized):
     while chefStaff not in ("O", "N"):
         chefStaff = input("Etes-vous chef ? (O/N) ")
         if chefStaff == "O":
-            queryChef = (
-                "UPDATE STAFF SET Prix_chef = '300.00' WHERE Id_staff = '{}'".format(myCursor.lastrowid))
-            myCursor.execute(queryChef)
+            queryChef = "UPDATE STAFF SET Prix_chef = '300.00' WHERE Id_staff = %s"
+            myCursor.execute(queryChef, (myCursor.lastrowid))
             cnx.commit()
 
     print("\nVous êtes enregistré en tant que staff ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte\n")
