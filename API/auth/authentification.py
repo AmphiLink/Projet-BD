@@ -24,7 +24,7 @@ def main_auth(cnx):
             "Entrez 'login'.Vous n'avez pas de compte ? Entrez 'register'\n")
         sleep(1)
     if Connexion_type == "login":
-        Authorized = login(cnx)
+        Authorized = login(cnx, Authorized=False)
     elif Connexion_type == "register":
         register(cnx)
     else:
@@ -34,7 +34,7 @@ def main_auth(cnx):
     return Authorized
 
 
-def login(cnx):
+def login(cnx, Authorized):
     """
     Permet à l'utilisateur de se connecter à l'application.
 
@@ -226,9 +226,9 @@ def staffRegister(cnx, myCursor):
     myCursor.fetchall()
 
     # On le met dans la table correspondant à son métier
-    queryJob = "INSERT INTO %s (Id_staff) VALUES(%s)"
-    myCursor.execute(queryJob, (
-        UserJob, myCursor.lastrowid))
+    queryJob = "INSERT INTO {} (Id_staff) VALUES({})".format(
+        UserJob, myCursor.lastrowid)
+    myCursor.execute(queryJob)
     cnx.commit()
 
     # On lui demande si il est chef et on récupère de nouveau l'id_staff dans notre curseur

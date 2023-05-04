@@ -20,10 +20,7 @@ def main():
     print("Bienvenue sur notre API Camping.\n")
 
     # On récupère les informations de l'utilisateur connecté
-    # chef_state, user_state, Id_Pers = main_auth(cnx, Authorized=False)
-    chef_state = True
-    user_state = "ADMINISTRATION"
-    Id_Pers = 1
+    chef_state, user_state, Id_Pers = main_auth(cnx)
     if chef_state:
         os.system("cls")
         print("Bienvenue dans la partie Chef de l'application !")
