@@ -69,11 +69,12 @@ create table CUISINIER (
 create table EMPLACEMENT (
      Id_emplacement int not null AUTO_INCREMENT,
      Type_emplacement varchar(250) not null,
-     Occupation char not null,
+     Occupation boolean not null,
      Prix float(1) not null,
-     bbq char not null,
+     bbq boolean not null,
      nbr_places int not null,
-     acces_eau char not null,
+     acces_eau boolean not null,
+     Cuisinier boolean not null,
      constraint ID_EMPLACEMENT_ID primary key (Id_emplacement));
 
 create table EQUIPE (
