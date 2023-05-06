@@ -89,7 +89,7 @@ def main_cuisinier(cnx, Id_Pers):
         queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
         Verif1.execute(queryIdEmplacementPrime, (Id_cuis,))
 
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s AND  Id_tournoi = None"
+        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s AND Id_tournoi = None"
         Verif2.execute(queryIdEmplacementPrime, (Id_cuis,))
 
         if Verif1.rowcount != -1 and Verif2.rowcount != -1:

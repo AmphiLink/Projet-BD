@@ -122,7 +122,7 @@ create table NETTOIE (
      Date_net date not null,
      Heure varchar(250) not null,
      Id_secteur int not null,
-     constraint ID_NETTOIE_ID primary key (Id_tech, Heure, Date_net));
+     constraint ID_NETTOIE_ID primary key (Heure, Date_net));
 
 create table participe (
      Id_equipe int not null,
