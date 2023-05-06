@@ -21,9 +21,6 @@ def main():
 
     # On récupère les informations de l'utilisateur connecté
     chef_state, user_state, Id_Pers = main_auth(cnx)
-    # chef_state = False
-    # user_state = "CUISINIER"
-    # Id_Pers = 2
     if chef_state:
         os.system("cls")
         print("Bienvenue dans la partie Chef de l'application !")

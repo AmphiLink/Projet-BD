@@ -53,6 +53,7 @@ def login(cnx, Authorized):
 
         myCursor = cnx.cursor(prepared=True)
         # On crée une liste contenant le nom et l'age de l'utilisateur
+        UserInfosListe = []
         UserInfosListe = input(
             "Entrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
         PasswordLogin = input("Entrez votre mot de passe ")
@@ -65,17 +66,22 @@ def login(cnx, Authorized):
         if len(UserInfosListe) != 2:
             login(cnx, Authorized)
 
-        queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
-        myCursor.execute(queryLogin, (UserInfosListe[0], UserInfosListe[1]))
+        # On vérifie si l'utilisateur a rentré le bon nom et le bon âge
+        queryInfos = "SELECT Nom, Age FROM PERSONNE WHERE Nom = %s AND Age = %s"
+        myCursor.execute(queryInfos, (UserInfosListe[0], UserInfosListe[1]))
         test = myCursor.fetchall()
         if test == []:
-            print("Mauvais nom et/ou Age Veuillez recommencer !")
-            sleep(1)
-            login(cnx, Authorized)
+            print("Mauvais nom ou mauvais age. Veuillez réessayer")
+            Authorized = False
+            return login(cnx, Authorized)
+
+        myCursor = cnx.cursor(prepared=True)
+        queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
+        myCursor.execute(queryLogin, (UserInfosListe[0], UserInfosListe[1]))
+        HashPassword = myCursor.fetchall()
 
         # On compare le password hashé au password entré par l'utilisateur
-        print(test)
-        resolve = verify_password(PasswordLogin, test)
+        resolve = verify_password(PasswordLogin, HashPassword)
         if not resolve:
             print("Mauvais mot de passe. Veuillez réessayer")
             Authorized = False

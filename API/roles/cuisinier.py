@@ -50,16 +50,11 @@ def main_cuisinier(cnx, Id_Pers):
         myCursor.execute(queryIdTournoi, (Date_tournoi, Heure, Lieu))
         Id_tournoi = myCursor.fetchall()[0][0]
 
-        # On récupère le potentiel Id_emplacement
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
-        myCursor.execute(queryIdEmplacementPrime, (Id_cuis,))
-        Id_emplacement = myCursor.fetchall[0][0]
-
-        queryCusinierVerif = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
-        myCursor.execute(queryCusinierVerif, (Id_cuis,))
-        VerifIdCuis = myCursor.fetchall()[0][0]
-        # On vérifie si un cuisinier cuisine déjà pour un tournoi OU un emplacement
-        if VerifIdCuis == None:
+        # On vérifie si un cuisinier est présent dans la table cuisine en général
+        queryIdCuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
+        myCursor.execute(queryIdCuis, (Id_cuis,))
+        VerifIdCuis = myCursor.fetchall()
+        if VerifIdCuis == []:
             # Si non pas de souci à se faire on insère les données
             queryAddCuisTournoi = "INSERT INTO cuisine (Id_cuis, Id_tournoi) VALUES(%s, %s)"
             myCursor.execute(queryAddCuisTournoi, (Id_cuis, Id_tournoi))
@@ -75,111 +70,123 @@ def main_cuisinier(cnx, Id_Pers):
                 myCursor.execute(queryAddCuisTournoi)
             else:
                 # Si oui on insère une nouvelle colonne en reprenant l'id de l'emplacement pour lequel le cuisinier cuisine
+                queryIdEmplacement = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
+                myCursor.execute(queryIdEmplacement, (Id_cuis,))
+                Id_emplacement = myCursor.fetchall()[0][0]
+
                 queryAddCuisTournoi = "INSERT INTO cuisine (Id_emplacement, Id_cuis, Id_tournoi) VALUES(%s, %s, %s)"
                 myCursor.execute(queryAddCuisTournoi,
                                  (Id_emplacement, Id_cuis, Id_tournoi))
         cnx.commit()
+        main_cuisinier(cnx, Id_Pers)
 
     elif choix == "Cuisiner pour un emplacement":
         myCursor = cnx.cursor(prepared=True)
+        bungalow = input(
+            "Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
+        if bungalow == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
 
-        # On vérifie si le cuisinier ne travaille pas déjà pour un emplacement
-        Verif1 = cnx.cursor()
-        Verif2 = cnx.cursor()
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
-        Verif1.execute(queryIdEmplacementPrime, (Id_cuis,))
+        # On récupère l'id de l'emplacement en question
+        queryIdEmplacement = "SELECT Id_emplacement from EMPLACEMENT WHERE Id_emplacement = %s"
+        myCursor.execute(queryIdEmplacement, (bungalow,))
+        Id_emplacement = myCursor.fetchall()[0][0]
 
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s AND Id_tournoi = None"
-        Verif2.execute(queryIdEmplacementPrime, (Id_cuis,))
-
-        if Verif1.rowcount != -1 and Verif2.rowcount != -1:
-            Id_emplacementPrime = Verif1.fetchall()[0][0]
-            Id_emplacementPrimeTournoi = Verif2.fetchall()[0][0]
-
-            if Id_emplacementPrime == None and Id_emplacementPrimeTournoi == None:
-                bungalow = input(
-                    "Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
-                if bungalow == "exit":
-                    print("Vous avez quitté l'application")
-                    sleep(1)
-                    exit()
-
-                # On récupère l'id de l'emplacement en question
-                queryIdEmplacement = "SELECT Id_emplacement from EMPLACEMENT WHERE Id_emplacement = %s"
-                myCursor.execute(queryIdEmplacement, (bungalow,))
-                Id_emplacement = myCursor.fetchall[0][0]
-
-                # On vérifie si le cuisinier cuisine déjà pour un tournoi
-                queryVerifTournoi = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
-                myCursor.execute(queryVerifTournoi, (Id_tournoi,))
-                IdVerifTournoi = myCursor.fetchall()[0][0]
-                if IdVerifTournoi == None:
-                    # Si non pas de problème on insère les données
-                    queryAddCuisEmplacement = "INSERT INTO cuisine (Id_emplacement, Id_cuis) VALUES(%s, %s)"
-                else:
-                    # Si oui on update la table cuisine
-                    queryAddCuisEmplacement = "UPDATE cuisine SET Id_emplacement = %s WHERE Id_cuis = %s"
-                myCursor.execute(queryAddCuisEmplacement,
-                                 (Id_emplacement, Id_cuis))
-                cnx.commit()
-
-                # On met à jour l'emplacement
-                queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = true"
-                myCursor.execute(queryUpdateEmplacement)
-                cnx.commit()
-                main_cuisinier(cnx, Id_Pers)
-            else:
-                print(
-                    "Vous cuisinez déjà pour un emplacement ! Vous ne pouvez cuisiner que pour un emplacement à la fois")
-                main_cuisinier(cnx, Id_Pers)
+        # On vérifie si un cuisinier est présent dans la table cuisine en général
+        queryIdCuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
+        myCursor.execute(queryIdCuis, (Id_cuis,))
+        VerifIdCuis = myCursor.fetchall()
+        if VerifIdCuis == []:
+            # Si non pas de souci à se faire on insère les données
+            queryAddCuisEmplacement = "INSERT INTO cuisine (Id_cuis, Id_emplacement) VALUES(%s, %s)"
         else:
-            print("Vous cuisinez déjà pour un emplacement ! Vous ne pouvez cuisiner que pour un emplacement à la fois")
-            main_cuisinier(cnx, Id_Pers)
-
-    elif choix == "Arrêter de cuisiner pour un emplacement":
-        myCursor = cnx.cursor(prepared=True)
-
-        # On vérifie si le cuisinier travaille bien dans un emplacement
-        queryId_cuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
-        myCursor.execute(queryId_cuis, (Id_cuis,))
-
-        if myCursor.rowcount == -1:
-            print("Vous ne travaillez pour aucun emplacement !")
-            main_cuisinier(cnx, Id_Pers)
-
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
-        myCursor.execute(queryIdEmplacementPrime, (Id_cuis,))
-        Id_emplacementPrime = myCursor.fetchall()[0][0]
-
-        queryIdEmplacementPrime = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s AND  Id_tournoi = None"
-        myCursor.execute(queryIdEmplacementPrime, (Id_cuis,))
-        Id_emplacementPrimeTournoi = myCursor.fetchall()[0][0]
-
-        if Id_emplacementPrime == None and Id_emplacementPrimeTournoi == None:
-            print("Vous ne travaillez pour aucun emplacement")
-            main_cuisinier(cnx, Id_Pers)
-        else:
-            print("Veuillez vérifier votre profil afin de regarder le numéro d'identification de l'emplacement pour lequel vous travaillez")
-            Id_emplacement = "Saisissez le numéro du bungalow pour lequel vous arrêtez de cuisiner"
-
-            # On vérifie si le cuisinier cuisine pour un tournoi
+            # Si oui il faut vérifier si ce cuisininier cuisine pour des tournois
             query = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
             myCursor.execute(query, (Id_cuis,))
             VerifIdTournoi = myCursor.fetchall()[0][0]
 
             if VerifIdTournoi == None:
-
-                # On supprime la cuisine
-                queryDelCuis = "DELETE Id_cuisine FROM cuisine WHERE Id_emplacement = %s"
+                # Si non cela veut dire que le cuisinier cuisine pour un emplacement or il ne peut pas
+                print("Vous cuisinez déjà pour un emplacement !")
+                sleep(1)
+                main_cuisinier(cnx, Id_Pers)
             else:
-                # On supprime seulement l'emplacement
-                queryDelCuis = "DELETE Id_emplacement FROM cuisine WHERE Id_emplacement = %s"
+                # On vérifie quand même si le cuisinier cuisine pour un emplacement
+                queryIdEmplacement = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
+                myCursor.execute(queryIdEmplacement, (Id_cuis,))
+                VerifIdEmplacement = myCursor.fetchall()[0][0]
+                if VerifIdEmplacement == None:
+                    # Si non cela veut dire que le cuisinier cuisine pour un tournoi on fait donc un update
+                    queryAddCuisEmplacement = "UPDATE cuisine SET Id_emplacement = %s WHERE Id_cuis = %s"
+                else:
+                    # Si oui cela veut dire que le cuisinier cuisine pour un emplacement or il ne peut pas
+                    print("Vous cuisinez déjà pour un emplacement !")
+                    sleep(1)
+                    main_cuisinier(cnx, Id_Pers)
+        myCursor.execute(queryAddCuisEmplacement,
+                         (Id_emplacement, Id_cuis))
+        cnx.commit()
 
-            myCursor.execute(queryDelCuis(Id_emplacement,))
-            cnx.commit()
+        # On met à jour l'emplacement
+        queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = true"
+        myCursor.execute(queryUpdateEmplacement)
+        cnx.commit()
+        main_cuisinier(cnx, Id_Pers)
 
-            # On met à jour l'emplacement
-            queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = false"
-            myCursor.execute(queryUpdateEmplacement)
-            cnx.commit()
+    elif choix == "Arrêter de cuisiner pour un emplacement":
+        myCursor = cnx.cursor(prepared=True)
+
+        # On vérifie si un cuisinier est présent dans la table cuisine en général
+        queryIdCuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
+        myCursor.execute(queryIdCuis, (Id_cuis,))
+        VerifIdCuis = myCursor.fetchall()
+
+        if VerifIdCuis != []:
+            # On vérifie si le cuisinier travaille bien dans un emplacement
+            queryId_cuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s AND Id_emplacement != 'None'"
+            myCursor.execute(queryId_cuis, (Id_cuis,))
+
+            if myCursor.fetchall() == []:
+                print("Vous ne travaillez pour aucun emplacement !")
+                main_cuisinier(cnx, Id_Pers)
+            else:
+                print("Veuillez vérifier votre profil afin de regarder le numéro d'identification de l'emplacement pour lequel vous travaillez")
+                Id_emplacement = input(
+                    "Saisissez le numéro du bungalow pour lequel vous arrêtez de cuisiner ")
+
+                # On cast l'Id_emplacement en int
+                Id_emplacement = int(Id_emplacement)
+                if Id_emplacement == "exit":
+                    print("Vous avez quitté l'application")
+                    sleep(1)
+                    exit()
+
+                # On vérifie si le cuisinier cuisine pour un tournoi
+                query = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
+                myCursor.execute(query, (Id_cuis,))
+                VerifIdTournoi = myCursor.fetchall()[0][0]
+
+                if VerifIdTournoi == None:
+
+                    # On supprime la cuisine
+                    queryDelCuis = "DELETE Id_cuisine FROM cuisine WHERE Id_emplacement = %s"
+                else:
+                    # On supprime seulement l'emplacement
+                    queryDelCuis = "UPDATE cuisine SET Id_emplacement = '' where Id_emplacement = %s"
+
+                myCursor.execute(
+                    queryDelCuis, (Id_emplacement,))
+                cnx.commit()
+
+                # On met à jour l'emplacement
+                queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = false"
+                myCursor.execute(queryUpdateEmplacement)
+                cnx.commit()
+                print(
+                    "Vous avez arrêté de cuisiner pour cet emplacement et le statut de l'emplacement a été mis à jour")
+                main_cuisinier(cnx, Id_Pers)
+        else:
+            print("Vous ne travaillez pour aucun emplacement !")
             main_cuisinier(cnx, Id_Pers)
