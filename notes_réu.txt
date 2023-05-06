@@ -90,3 +90,7 @@ Questions Pol Benats :
 -problème avec la table gère
 -structure d'un projet en python
 -Problème inserion de données
+
+Remarque importante :
+Lorsqu'un cuisinier cuisine pour un emplacement il n'ya pas de date car il devient cuisinier attitré de l'emplacement jusqu'à ce qu'il résilie décide d'arrêter de cuisiner
+pour cet emplacement

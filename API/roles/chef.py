@@ -35,6 +35,13 @@ def main_chef(user_state, cnx, Id_Pers):
         prenomsListe = prenom.split(" ")
         age = input("Age de l'employé : ")
         password = input("Mot de passe de l'employé : ")
+
+        if nom == "exit" or prenom == "exit" or age == "exit" or password == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
+
+        # On hash le mot de passe
         password = hash_password(password)
 
         # Insertion dans la table Personne
@@ -67,6 +74,11 @@ def main_chef(user_state, cnx, Id_Pers):
     elif choix == "supprimer_employee":
         nom = input("Nom de l'employé : ")
         age = input("Age de l'employé : ")
+
+        if age == "exit" or nom == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
 
         # Suppression dans la table correspondante au job de l'employé
         queryDeleteJob = "DELETE FROM {} WHERE Id_staff = (SELECT Id_staff FROM STAFF WHERE Id_Pers = (SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND Age = %s))".format(

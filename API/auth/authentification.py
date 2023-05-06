@@ -24,14 +24,14 @@ def main_auth(cnx):
             "Entrez 'login'.Vous n'avez pas de compte ? Entrez 'register'\n")
         sleep(1)
     if Connexion_type == "login":
-        Authorized = login(cnx, Authorized=False)
+        chef_state, user_state, Id_Pers = login(cnx, Authorized=False)
     elif Connexion_type == "register":
         register(cnx)
     else:
         print("\nVous avez quitté l'application")
         sleep(1)
         exit()
-    return Authorized
+    return chef_state, user_state, Id_Pers
 
 
 def login(cnx, Authorized):
@@ -56,6 +56,14 @@ def login(cnx, Authorized):
         UserInfosListe = input(
             "Entrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
         PasswordLogin = input("Entrez votre mot de passe ")
+
+        if UserInfosListe[0] == "exit" or PasswordLogin == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
+
+        if len(UserInfosListe) != 2:
+            login(cnx, Authorized)
 
         queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
         myCursor.execute(queryLogin, (UserInfosListe[0], UserInfosListe[1]))
@@ -82,10 +90,9 @@ def login(cnx, Authorized):
     # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
     queryChef = "SELECT Prix_chef FROM STAFF WHERE Id_Pers = %s"
     myCursor.execute(queryChef, (Id_Pers,))
-    myCursor.fetchall()
+    Prix_chef = myCursor.fetchall()[0][0]
 
-    # On vérifie si Prix_chef n'est pas nul
-    if myCursor.rowcount != 0:
+    if Prix_chef != None:
         chef_state = True
 
     # on récupère l'IdStaff de l'utilisateur
@@ -144,9 +151,14 @@ def register(cnx):
     UserSurnameList = UserSurname.split(" ")
     UserAge = input("Quel est votre âge ? ")
     UserRole = input("Quel est votre rôle (STAFF ou CLIENT) ? ")
-    while UserRole not in ("STAFF", "CLIENT"):
+    while UserRole not in ("STAFF", "CLIENT", "exit"):
         UserRole = input("Quel est votre rôle (STAFF ou CLIENT) ? ")
     Password = input("Entrez votre mot de passe ? ")
+
+    if UserName == "exit" or UserSurname == "exit" or UserAge == "exit" or UserRole == "exit" or Password == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
     # On hash le mot de passe
     HashToSend = hash_password(Password)
 
@@ -168,6 +180,8 @@ def register(cnx):
     # On le met dans la table client
     if UserRole == "CLIENT":
         userRegister(cnx, myCursor)
+
+    # Ou dans la table STAFF
     else:
         staffRegister(cnx, myCursor)
 
@@ -182,19 +196,19 @@ def userRegister(cnx, myCursor):
     myCursor : mysql.connector.connection_cext.CPreparedMySQLConnection (sa lastrowid contient celle du client enregistré précédemmment donc elle nous sera utile) (Object)
     """
     Cursor = cnx.cursor(prepared=True)
-    print("Vous vous êtes enregistré en tant que client dans notre camping veuillez entrer ces informations supplémentaires :")
+    print("Vous vous êtes enregistré en tant que client dans notre camping veuillez entrer ces informations supplémentaires :\nPS : La commande exit ne fonctionne pas dans cette section.")
     UserCountry = input("De quel pays venez vous ? ")
     UserCP = input("Quel est votre code postal ? ")
     UserCity = input("Quel est votre ville ? ")
     UserHouseNumber = input("Quel est votre numéro de maison ? ")
     UserPhone = input("Quel est votre numéro de téléphone ? ")
     UserMail = input("Quel est votre adresse mail ? ")
-    queryCli = "INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_telephone, Con_Email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
+    queryCli = "INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_telephone, Con_Email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
     Cursor.execute(queryCli, (myCursor.lastrowid, UserCountry,
                    UserCP, UserCity, UserHouseNumber, UserPhone, UserMail))
     cnx.commit()
-    print("\nVous êtes enregistré en tant que client ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte")
+    print("\nVous êtes enregistré en tant que client ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte.")
     main_auth(cnx)
 
 
@@ -209,7 +223,7 @@ def staffRegister(cnx, myCursor):
     """
 
     UserJob = "nothing"
-    print("\nVous vous êtes enregistré en tant que staff dans notre camping veuillez entrer ces informations supplémentaires :\n")
+    print("\nVous vous êtes enregistré en tant que staff dans notre camping veuillez entrer ces informations supplémentaires :\nPS : La commande exit ne fonctionne pas dans cette section.")
     while UserJob not in ("TECHNICIEN", "CUISINIER", "ANIMATEUR", "ADMINISTRATION"):
         UserJob = input(
             "Quel est votre métier ? (TECHNICIEN, CUISINIER, ANIMATEUR ou ADMINISTRATION) ")
@@ -231,16 +245,12 @@ def staffRegister(cnx, myCursor):
     myCursor.execute(queryJob)
     cnx.commit()
 
-    # On lui demande si il est chef et on récupère de nouveau l'id_staff dans notre curseur
-    myCursor.execute(queryIdStaff)
-    myCursor.fetchall()
-
     chefStaff = "Nothing"
     while chefStaff not in ("O", "N"):
         chefStaff = input("Etes-vous chef ? (O/N) ")
         if chefStaff == "O":
             queryChef = "UPDATE STAFF SET Prix_chef = '300.00' WHERE Id_staff = %s"
-            myCursor.execute(queryChef, (myCursor.lastrowid))
+            myCursor.execute(queryChef, (myCursor.lastrowid,))
             cnx.commit()
 
     print("\nVous êtes enregistré en tant que staff ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte\n")

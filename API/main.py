@@ -21,24 +21,32 @@ def main():
 
     # On récupère les informations de l'utilisateur connecté
     chef_state, user_state, Id_Pers = main_auth(cnx)
+    # chef_state = False
+    # user_state = "CUISINIER"
+    # Id_Pers = 2
     if chef_state:
         os.system("cls")
         print("Bienvenue dans la partie Chef de l'application !")
         main_chef(user_state, cnx, Id_Pers)
     else:
         if user_state == "ADMINISTRATION":
+            os.system("cls")
             print("Bienvenue dans la partie Admin de l'application !")
             main_admin(cnx, Id_Pers)
         elif user_state == "CUISINIER":
+            os.system("cls")
             print("Bienvenue dans la partie Cuisinier de l'application !")
             main_cuisinier(cnx, Id_Pers)
         elif user_state == "ANIMATEUR":
+            os.system("cls")
             print("Bienvenue dans la partie Animateur de l'application !")
             main_animateur(cnx, Id_Pers)
         elif user_state == "TECHNICIEN":
+            os.system("cls")
             print("Bienvenue dans la partie Technicien de l'application !")
             main_technicien(cnx, Id_Pers)
         else:
+            os.system("cls")
             print("Bienvenue dans la partie Client de l'application !")
             main_client(cnx, Id_Pers)
 

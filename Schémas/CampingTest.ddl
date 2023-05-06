@@ -3,7 +3,7 @@
 -- *--------------------------------------------
 -- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
--- * Generation date: Thu Apr 27 12:45:23 2023 
+-- * Generation date: Sat May  6 11:21:02 2023 
 -- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
 -- * Schema: camping_physique/1-1 
 -- ********************************************* 
@@ -12,7 +12,7 @@
 -- Database Section
 -- ________________ 
 
--- create database camping_physique;
+create database camping_physique;
 use camping_physique;
 
 
@@ -20,28 +20,28 @@ use camping_physique;
 -- _____________ 
 
 create table ACTIVITE (
-     Id_acti int not null AUTO_INCREMENT,
-     Date_acti date not null,
-     Heure varchar(250) not null,
+     Id_acti int not null,
+     Date_acti date not null comment 'format : "YYYY-MM-DD"',
+     Heure varchar(250) not null comment 'format:"HH : MM"',
      Lieu varchar(250) not null,
      Id_type_acti int not null,
      Id_anim int not null,
      constraint ID_ACTIVITE_ID primary key (Id_acti));
 
 create table ADMINISTRATION (
-     Id_admin int not null AUTO_INCREMENT,
+     Id_admin int not null,
      Id_staff int not null,
      constraint ID_ADMINISTRATION_ID primary key (Id_admin),
      constraint FKSTA_ADM_ID unique (Id_staff));
 
 create table ANIMATEUR (
-     Id_anim int not null AUTO_INCREMENT,
+     Id_anim int not null,
      Id_staff int not null,
      constraint ID_ANIMATEUR_ID primary key (Id_anim),
      constraint FKSTA_ANI_ID unique (Id_staff));
 
 create table CLIENT (
-     Id_cli int not null AUTO_INCREMENT,
+     Id_cli int not null,
      Id_Pers int not null,
      Pays varchar(250) not null,
      Code_postal int not null,
@@ -54,20 +54,20 @@ create table CLIENT (
      constraint FKPER_CLI_ID unique (Id_Pers));
 
 create table cuisine (
-     Id_cuisine int not null AUTO_INCREMENT,
+     Id_cuisine int not null,
      Id_cuis int not null,
      Id_emplacement int,
      Id_tournoi int,
      constraint ID_cuisine_ID primary key (Id_cuisine));
 
 create table CUISINIER (
-     Id_cuis int not null AUTO_INCREMENT,
+     Id_cuis int not null,
      Id_staff int not null,
      constraint ID_CUISINIER_ID primary key (Id_cuis),
      constraint FKSTA_CUI_ID unique (Id_staff));
 
 create table EMPLACEMENT (
-     Id_emplacement int not null AUTO_INCREMENT,
+     Id_emplacement int not null,
      Type_emplacement varchar(250) not null,
      Occupation char not null,
      Prix float(1) not null,
@@ -77,14 +77,14 @@ create table EMPLACEMENT (
      constraint ID_EMPLACEMENT_ID primary key (Id_emplacement));
 
 create table EQUIPE (
-     Id_equipe int not null AUTO_INCREMENT,
+     Id_equipe int not null,
      Nom varchar(250) not null,
      Nbr_pers int not null,
      constraint ID_EQUIPE_ID primary key (Id_equipe));
 
 create table FICHE_COMPTA (
-     Id_fiche_compta int not null AUTO_INCREMENT,
-     Date_fiche date not null,
+     Id_fiche_compta int not null,
+     Date_fiche date not null comment 'format : "YYYY-MM-DD"',
      Prix_total float(1) not null,
      Id_admin int not null,
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
@@ -97,18 +97,18 @@ create table inscription (
 create table loue_emplacement (
      Id_cli int not null,
      Id_emplacement int not null,
-     Date_debut date not null,
-     Date_fin date not null,
+     Date_debut date not null comment 'format : "YYYY-MM-DD"',
+     Date_fin date not null comment 'format : "YYYY-MM-DD"',
      constraint ID_loue_emplacement_ID primary key (Id_emplacement, Id_cli));
 
 create table Loue_mat (
      Id_cli int not null,
      Id_mat int not null,
-     Date_loc date not null,
+     Date_loc date not null comment 'format : "YYYY-MM-DD"',
      constraint ID_Loue_mat_ID primary key (Id_mat, Id_cli));
 
 create table MATERIEL (
-     Id_mat int not null AUTO_INCREMENT,
+     Id_mat int not null,
      Nom varchar(250) not null,
      Type_mat varchar(250) not null,
      Prix int not null,
@@ -118,8 +118,8 @@ create table MATERIEL (
 
 create table NETTOIE (
      Id_tech int not null,
-     Date_net date not null,
-     Heure varchar(250) not null,
+     Date_net date not null comment 'format : "YYYY-MM-DD"',
+     Heure varchar(250) not null comment 'format:"HH : MM"',
      Id_secteur int not null,
      constraint ID_NETTOIE_ID primary key (Id_tech, Heure, Date_net));
 
@@ -131,7 +131,7 @@ create table participe (
 create table PERSONNE (
      Nom varchar(250) not null,
      Age int not null,
-     Id_Pers int not null AUTO_INCREMENT,
+     Id_Pers int not null,
      Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
@@ -153,7 +153,7 @@ create table SECTEUR (
      constraint ID_SECTEUR_ID primary key (Id_secteur));
 
 create table STAFF (
-     Id_staff int not null AUTO_INCREMENT,
+     Id_staff int not null,
      Id_Pers int not null,
      Prix float(1) not null,
      Prix_chef float(1),
@@ -166,23 +166,23 @@ create table STAFF (
      constraint FKPER_STA_ID unique (Id_Pers));
 
 create table TECHNICIEN (
-     Id_tech int not null AUTO_INCREMENT,
+     Id_tech int not null,
      Id_staff int not null,
      constraint ID_TECHNICIEN_ID primary key (Id_tech),
      constraint FKSTA_TEC_ID unique (Id_staff));
 
 create table TOURNOI (
-     Id_tournoi int not null AUTO_INCREMENT,
+     Id_tournoi int not null,
      Id_acti int not null,
-     Date_tournoi date not null,
-     Heure varchar(250) not null,
+     Date_tournoi date not null comment 'format : "YYYY-MM-DD"',
+     Heure char(1) not null comment 'format:"HH : MM"',
      Lieu varchar(250) not null,
      Prix float(1) not null,
      constraint ID_TOURNOI_ID primary key (Id_tournoi),
      constraint FKde_ID unique (Id_acti));
 
 create table TYPE_ACTI (
-     Id_type_acti int not null AUTO_INCREMENT,
+     Id_type_acti int not null,
      Prix float(1) not null,
      Taille_min_ int not null comment 'en cm',
      Age_min int not null,
@@ -301,8 +301,8 @@ alter table participe add constraint FKpar_EQU_FK
 --     check(exists(select * from Prenom
 --                  where Prenom.Id_Pers = Id_Pers)); 
 
--- alter table PERSONNE add constraint LSTONE_PERSONNE
---      check(STAFF is not null or CLIENT is not null); 
+alter table PERSONNE add constraint LSTONE_PERSONNE
+     check(STAFF is not null or CLIENT is not null); 
 
 alter table peut_faire add constraint FKpeu_TYP
      foreign key (Id_type_acti)
@@ -316,15 +316,15 @@ alter table Prenom add constraint FKPER_Pre
      foreign key (Id_Pers)
      references PERSONNE (Id_Pers);
 
--- alter table STAFF add constraint EXTONE_STAFF_1
---      check((Employe_ is not null and Prix_chef is null)
---            or (Employe_ is null and Prix_chef is not null)); 
+alter table STAFF add constraint EXTONE_STAFF_1
+     check((Employe_ is not null and Prix_chef is null)
+           or (Employe_ is null and Prix_chef is not null)); 
 
--- alter table STAFF add constraint EXTONE_STAFF
---      check((TECHNICIEN is not null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is null)
---            or (TECHNICIEN is null and ADMINISTRATION is not null and CUISINIER is null and ANIMATEUR is null)
---            or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is not null and ANIMATEUR is null)
---            or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is not null)); 
+alter table STAFF add constraint EXTONE_STAFF
+     check((TECHNICIEN is not null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is null)
+           or (TECHNICIEN is null and ADMINISTRATION is not null and CUISINIER is null and ANIMATEUR is null)
+           or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is not null and ANIMATEUR is null)
+           or (TECHNICIEN is null and ADMINISTRATION is null and CUISINIER is null and ANIMATEUR is not null)); 
 
 alter table STAFF add constraint FKPER_STA_FK
      foreign key (Id_Pers)
@@ -387,7 +387,7 @@ create index FKfait_partie_IND
      on CLIENT (Id_equipe);
 
 create unique index ID_cuisine_IND
-     on cuisine (Id_emplacement, Id_tournoi, Id_cuis);
+     on cuisine (Id_cuisine);
 
 create index FKcui_TOU_IND
      on cuisine (Id_tournoi);
