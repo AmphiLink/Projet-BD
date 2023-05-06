@@ -174,7 +174,7 @@ def main_cuisinier(cnx, Id_Pers):
                     queryDelCuis = "DELETE Id_cuisine FROM cuisine WHERE Id_emplacement = %s"
                 else:
                     # On supprime seulement l'emplacement
-                    queryDelCuis = "UPDATE cuisine SET Id_emplacement = '' where Id_emplacement = %s"
+                    queryDelCuis = "UPDATE cuisine SET Id_emplacement = NULL where Id_emplacement = %s"
 
                 myCursor.execute(
                     queryDelCuis, (Id_emplacement,))
