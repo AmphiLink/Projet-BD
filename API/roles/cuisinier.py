@@ -4,7 +4,6 @@ from time import sleep
 def main_cuisinier(cnx, Id_Pers):
     """
     Cette fonction permet d'utiliser les différentes fonctionnnalités de l'application en tant que cuisinier.
-    Ce rôle est reservé aux FEMMES (Alexis tu claques)
 
     Parameters:
     -----------
@@ -48,7 +47,13 @@ def main_cuisinier(cnx, Id_Pers):
         # On récupère l'id du tournoi en question
         queryIdTournoi = "SELECT Id_tournoi FROM TOURNOI WHERE Date_tournoi = %s AND Heure = %s AND Lieu = %s"
         myCursor.execute(queryIdTournoi, (Date_tournoi, Heure, Lieu))
-        Id_tournoi = myCursor.fetchall()[0][0]
+        Id_tournoi = myCursor.fetchall()
+
+        if Id_tournoi == []:
+            print("Ce tournoi n'existe pas !")
+            sleep(1)
+            main_cuisinier(cnx, Id_Pers)
+        Id_tournoi = Id_tournoi[0][0]
 
         # On vérifie si un cuisinier est présent dans la table cuisine en général
         queryIdCuis = "SELECT Id_cuis FROM cuisine WHERE Id_cuis = %s"
@@ -163,7 +168,17 @@ def main_cuisinier(cnx, Id_Pers):
                     sleep(1)
                     exit()
 
+                # On vérifie si l'Id_emplacement existe bien
+                queryIdEmplacement = "SELECT Id_emplacement FROM EMPLACEMENT WHERE Id_emplacement = %s"
+                myCursor.execute(queryIdEmplacement, (Id_emplacement,))
+                VerifIdEmplacement = myCursor.fetchall()
+
+                if VerifIdEmplacement == []:
+                    print("Cet emplacement n'existe pas !")
+                    main_cuisinier(cnx, Id_Pers)
+
                 # On vérifie si le cuisinier cuisine pour un tournoi
+                myCursor = cnx.cursor(prepared=True)
                 query = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
                 myCursor.execute(query, (Id_cuis,))
                 VerifIdTournoi = myCursor.fetchall()[0][0]

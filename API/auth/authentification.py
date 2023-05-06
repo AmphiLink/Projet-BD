@@ -99,8 +99,6 @@ def login(cnx, Authorized):
     chef_state = False
     user_state = "CLIENT"
 
-    # On vérifie si Id Pers et dans client ou dans staff
-
     # On récupère Prix_chef si celui-ci est nul alors l'utilisateur n'est pas un chef
     queryChef = "SELECT Prix_chef FROM STAFF WHERE Id_Pers = %s"
     myCursor.execute(queryChef, (Id_Pers,))
