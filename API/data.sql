@@ -25,18 +25,18 @@ create table ACTIVITE (
      Heure varchar(250) not null,
      Lieu varchar(250) not null,
      Id_type_acti int not null,
-     Id_anim int not null,
+     Id_anim int,
      constraint ID_ACTIVITE_ID primary key (Id_acti));
 
 create table ADMINISTRATION (
      Id_admin int not null AUTO_INCREMENT,
-     Id_staff int not null,
+     Id_staff int,
      constraint ID_ADMINISTRATION_ID primary key (Id_admin),
      constraint FKSTA_ADM_ID unique (Id_staff));
 
 create table ANIMATEUR (
      Id_anim int not null AUTO_INCREMENT,
-     Id_staff int not null,
+     Id_staff int,
      constraint ID_ANIMATEUR_ID primary key (Id_anim),
      constraint FKSTA_ANI_ID unique (Id_staff));
 
@@ -55,14 +55,14 @@ create table CLIENT (
 
 create table cuisine (
      Id_cuisine int not null AUTO_INCREMENT,
-     Id_cuis int not null,
+     Id_cuis int,
      Id_emplacement int,
      Id_tournoi int,
      constraint ID_cuisine_ID primary key (Id_cuisine));
 
 create table CUISINIER (
      Id_cuis int not null AUTO_INCREMENT,
-     Id_staff int not null,
+     Id_staff int,
      constraint ID_CUISINIER_ID primary key (Id_cuis),
      constraint FKSTA_CUI_ID unique (Id_staff));
 
@@ -168,7 +168,7 @@ create table STAFF (
 
 create table TECHNICIEN (
      Id_tech int not null AUTO_INCREMENT,
-     Id_staff int not null,
+     Id_staff int,
      constraint ID_TECHNICIEN_ID primary key (Id_tech),
      constraint FKSTA_TEC_ID unique (Id_staff));
 

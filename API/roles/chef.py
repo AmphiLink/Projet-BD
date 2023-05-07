@@ -1,6 +1,8 @@
 from time import sleep
 from auth.hash import hash_password
 from auth.authentification import staffPrice
+from roles.cuisinier import stop_emplacement
+import datetime
 import os
 
 
@@ -80,30 +82,167 @@ def main_chef(user_state, cnx, Id_Pers):
             sleep(1)
             exit()
 
-        # Suppression dans la table correspondante au job de l'employé
-        queryDeleteJob = "DELETE FROM {} WHERE Id_staff = (SELECT Id_staff FROM STAFF WHERE Id_Pers = (SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND Age = %s))".format(
-            user_state)
-        myCursor.execute(queryDeleteJob, (nom, age))
-        cnx.commit()
+        queryTest = "SELECT Nom, Age FROM PERSONNE WHERE Nom = %s AND Age = %s"
+        myCursor.execute(queryTest, (nom, age))
+        test = myCursor.fetchall()
+
+        if test == []:
+            print("Cet employé n'existe pas !")
+            sleep(1)
+            return main_chef(user_state, cnx, Id_Pers)
+
+        queryIdPers = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND Age = %s"
+        myCursor.execute(queryIdPers, (nom, age))
+        Id_Pers = myCursor.fetchall()[0][0]
+
+        queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
+        myCursor.execute(queryIdStaff, (Id_Pers,))
+        Id_staff = myCursor.fetchall()[0][0]
+
+        # Suppresssion d'un animateur
+        if user_state == "ANIMATEUR":
+            # On récupère Id_anim
+            queryIdAnim = "SELECT Id_anim FROM ANIMATEUR WHERE Id_staff = %s"
+            myCursor.execute(queryIdAnim, (Id_staff,))
+            Id_anim = myCursor.fetchall()[0][0]
+            # On s'intéresse d'abord aux tables ACTIVITE et peut_faire
+
+            # On supprime d'abord dans la table peut_faire
+            queryDeletePeutFaire = "DELETE FROM peut_faire WHERE Id_anim = %s"
+            myCursor.execute(queryDeletePeutFaire, (Id_anim,))
+            cnx.commit()
+
+            # On supprime ID_anim dans la table ACTIVITE
+            # Dans ce cas-ci on ne supprime pas l'activité car elle peut être faite par d'autres animateurs
+            # On vérifie si la date de l'activité est passée
+            queryNbrJours = "SELECT DATEDIFF(Date_acti, NOW()) FROM ACTIVITE WHERE Id_anim = %s"
+            myCursor.execute(queryNbrJours, (Id_anim,))
+            nbrJours = myCursor.fetchall()[0][0]
+            if nbrJours < 0:
+                # Cela veut dire que l'activité est passée
+                pass
+            else:
+                queryDeleteActivite = "UPDATE ACTIVITE SET Id_anim = NULL WHERE Id_anim = %s"
+                myCursor.execute(queryDeleteActivite, (Id_anim,))
+                cnx.commit()
+
+            # On s'intéresse à la table ANIMATEUR
+            # On supprime seulement Id_staff de animateur
+            queryDeleteAnim = "Update ANIMATEUR SET Id_staff = NULL WHERE Id_anim = %s"
+            myCursor.execute(queryDeleteAnim, (Id_anim,))
+            cnx.commit()
+
+        # Suppresion d'un cuisnier
+        elif user_state == "CUISINIER":
+            # On récupère Id_cuis
+            queryIdCuis = "SELECT Id_cuis FROM CUISINIER WHERE Id_staff = %s"
+            myCursor.execute(queryIdCuis, (Id_staff,))
+            Id_cuis = myCursor.fetchall()[0][0]
+
+            # On vérifie si il travaille pour un emplacement
+            queryEmplacement = "SELECT Id_emplacement FROM cuisine WHERE Id_cuis = %s"
+            myCursor.execute(queryEmplacement, (Id_cuis,))
+            test = myCursor.fetchall()
+
+            if test == []:
+                # Cela veut dire qu'il ne travaille pas pour un emplacement
+                pass
+            else:
+                # On le fait arrêter de travailler pour l'emplacement pour lequel il travaille
+                stop_emplacement(cnx, Id_Pers, Id_cuis)
+
+            # On vérifie si il travaille pour un tournoi
+            queryTournoi = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
+            myCursor.execute(queryTournoi, (Id_cuis,))
+            test = myCursor.fetchall()
+
+            if test == []:
+                # Cela veut dire qu'il ne travaille pas pour un tournoi
+                pass
+            else:
+                # On vérifie si le tournoi est passé
+                Id_tournoi = test[0][0]
+                queryNbrJours = "SELECT DATEDIFF(Date_tournoi, NOW()) FROM TOURNOI WHERE Id_tournoi = %s"
+                myCursor.execute(queryNbrJours, (Id_tournoi,))
+                nbrJours = myCursor.fetchall()[0][0]
+
+                if nbrJours < 0:
+                    # Cela veut dire que le tournoi est passé
+                    pass
+                else:
+                    # On supprime Id_cuis de la table cuisine afin qu'un autre cuisinier le remplace
+                    queryDeleteCuisine = "UPDATE CUISINE SET Id_cuis = NULL WHERE Id_cuis = %s"
+                    myCursor.execute(queryDeleteCuisine, (Id_cuis,))
+                    cnx.commit()
+
+            # On supprime Id_staff de CUISINIER
+            queryDeleteCuisine = "UPDATE CUISINIER SET Id_staff = NULL WHERE Id_cuis = %s"
+            myCursor.execute(queryDeleteCuisine, (Id_cuis,))
+            cnx.commit()
+
+        # Suppression d'un technicien
+        elif user_state == "TECHNICIEN":
+            # On récupère Id_tech
+            queryIdTech = "SELECT Id_tech FROM TECHNICIEN WHERE Id_staff = %s"
+            myCursor.execute(queryIdTech, (Id_staff,))
+            Id_tech = myCursor.fetchall()[0][0]
+
+            # On s'intéresse à la table NETTOIE
+            # On vérifie si la date de son netoyyage est passée
+            queryNbrJours = "SELECT DATEDIFF(Date_net, NOW()) FROM NETTOIE WHERE Id_tech = %s"
+            myCursor.execute(queryNbrJours, (Id_tech,))
+            nbrJours = myCursor.fetchall()[0][0]
+
+            if nbrJours < 0:
+                # Cela veut dire que le nettoyage est passé
+                pass
+            else:
+                queryDeleteTechnicien = "UPDATE NETTOIE SET Id_tech = NULL WHERE Id_tech = %s"
+                myCursor.execute(queryDeleteTechnicien, (Id_tech,))
+                cnx.commit()
+
+            # On supprime Id_staff de TECHNICIEN
+            queryDeleteTechnicien = "UPDATE TECHNICIEN SET Id_staff = NULL WHERE Id_tech = %s"
+            myCursor.execute(queryDeleteTechnicien, (Id_tech,))
+            cnx.commit()
+
+        # Suppression d'un administrateur
+        else:
+            # On réupère Id_admin de ADMINISTRATION
+            queryIdAdmin = "SELECT Id_admin FROM ADMINISTRATION WHERE Id_staff = %s"
+            myCursor.execute(queryIdAdmin, (Id_staff,))
+            Id_admin = myCursor.fetchall()[0][0]
+
+            # On ne supprime rien dans fiche compta on doit garder un historique de toute la compta de chaque année et chaque mois
+
+            # On supprime Id_admin de MATERIEL (pas besoin d'historique sur qui s'occupe de la gestion du matériel)
+            queryDeleteAdmin = "UPDATE MATERIEL SET Id_admin = NULL WHERE Id_admin = %s"
+            myCursor.execute(queryDeleteAdmin, (Id_admin,))
+            cnx.commit()
+
+            # On supprime Id_staff de ADMINISTRATION
+            queryDeleteAdmin = "UPDATE ADMINISTRATION SET Id_staff = NULL WHERE Id_admin = %s"
+            myCursor.execute(queryDeleteAdmin, (Id_admin,))
+            cnx.commit()
+
+        # Ces étapes sont communes à tous les jobs
 
         # Suppression dans la table Staff du nouvel employé
-        queryDeleteStaff = "DELETE FROM STAFF WHERE Id_Pers = (SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND Age = %s)"
-        myCursor.execute(queryDeleteStaff, (nom, age))
+        queryDeleteStaff = "DELETE FROM STAFF WHERE Id_Pers = %s"
+        myCursor.execute(queryDeleteStaff, (Id_Pers,))
         cnx.commit()
 
         # Partie pour supprimer le.s prénom.s de l'employé
-        queryId = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND  Age = %s"
-        myCursor.execute(queryId, (nom, age))
-        Id_Pers = myCursor.fetchall()[0][0]
         queryDeletePrenom = "DELETE FROM Prenom WHERE Id_Pers = %s"
         myCursor.execute(queryDeletePrenom, (Id_Pers,))
         cnx.commit()
 
         # Suppression dans la table Personne
-        queryDelete = "DELETE FROM PERSONNE WHERE Nom = %s AND Age = %s"
-        myCursor.execute(queryDelete, (nom, age))
+        queryDelete = "DELETE FROM PERSONNE WHERE Id_Pers = %s"
+        myCursor.execute(queryDelete, (Id_Pers,))
         cnx.commit()
         print("L'employé a bien été supprimé !")
+        main_chef(user_state, cnx)
     else:
         print("Vous avez quitté l'application")
         sleep(1)
