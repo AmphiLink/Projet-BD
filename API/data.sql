@@ -114,11 +114,11 @@ create table MATERIEL (
      Type_mat varchar(250) not null,
      Prix int not null,
      Etat varchar(250) not null,
-     Id_admin int not null,
+     Id_admin int,
      constraint ID_MATERIEL_ID primary key (Id_mat));
 
 create table NETTOIE (
-     Id_tech int not null,
+     Id_tech int,
      Date_net date not null,
      Heure varchar(250) not null,
      Id_secteur int not null,
@@ -149,7 +149,7 @@ create table Prenom (
      constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
 
 create table SECTEUR (
-     Id_secteur int not null,
+     Id_secteur int not null AUTO_INCREMENT,
      Nom varchar(250) not null,
      constraint ID_SECTEUR_ID primary key (Id_secteur));
 

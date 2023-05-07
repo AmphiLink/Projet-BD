@@ -85,3 +85,5 @@ def liste_activités(cnx):
     for Id_type_acti, Nom, Prix, Taille_min_, Age_min in myCursor:
         print("%s :  %s, Prix : %s, Taille_min : %s, Age_min :  %s" %
               (Id_type_acti, Nom, Prix, Taille_min_, Age_min))
+    stop = input("Appuyez sur une touche pour continuer")
+    os.system("cls")

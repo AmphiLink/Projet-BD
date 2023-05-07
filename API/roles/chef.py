@@ -117,14 +117,19 @@ def main_chef(user_state, cnx, Id_Pers):
             # On vérifie si la date de l'activité est passée
             queryNbrJours = "SELECT DATEDIFF(Date_acti, NOW()) FROM ACTIVITE WHERE Id_anim = %s"
             myCursor.execute(queryNbrJours, (Id_anim,))
-            nbrJours = myCursor.fetchall()[0][0]
-            if nbrJours < 0:
-                # Cela veut dire que l'activité est passée
-                pass
-            else:
-                queryDeleteActivite = "UPDATE ACTIVITE SET Id_anim = NULL WHERE Id_anim = %s"
-                myCursor.execute(queryDeleteActivite, (Id_anim,))
-                cnx.commit()
+            DateList = myCursor.fetchall()
+            for Date_acti in DateList:
+                maDate = str(Date_acti[0])
+                queryNbrJours = "SELECT DATEDIFF(Date_acti, NOW()) FROM ACTIVITE WHERE Id_anim = %s and Date_acti = %s"
+                myCursor.execute(queryNbrJours, (Id_anim, maDate))
+                nbrJours = myCursor.fetchall()[0][0]
+                if nbrJours < 0:
+                    # Cela veut dire que l'activité est passée
+                    pass
+                else:
+                    queryDeleteActivite = "UPDATE ACTIVITE SET Id_anim = NULL WHERE Id_anim = %s AND Date_acti = %s"
+                    myCursor.execute(queryDeleteActivite, (Id_anim, maDate))
+                    cnx.commit()
 
             # On s'intéresse à la table ANIMATEUR
             # On supprime seulement Id_staff de animateur
@@ -164,16 +169,23 @@ def main_chef(user_state, cnx, Id_Pers):
                 Id_tournoi = test[0][0]
                 queryNbrJours = "SELECT DATEDIFF(Date_tournoi, NOW()) FROM TOURNOI WHERE Id_tournoi = %s"
                 myCursor.execute(queryNbrJours, (Id_tournoi,))
-                nbrJours = myCursor.fetchall()[0][0]
+                DateList = myCursor.fetchall()
 
-                if nbrJours < 0:
-                    # Cela veut dire que le tournoi est passé
-                    pass
-                else:
-                    # On supprime Id_cuis de la table cuisine afin qu'un autre cuisinier le remplace
-                    queryDeleteCuisine = "UPDATE CUISINE SET Id_cuis = NULL WHERE Id_cuis = %s"
-                    myCursor.execute(queryDeleteCuisine, (Id_cuis,))
-                    cnx.commit()
+                for Date_tournoi in DateList:
+                    maDate = str(Date_tournoi[0])
+                    queryNbrJours = "SELECT DATEDIFF(Date_tournoi, NOW()) FROM TOURNOI WHERE Id_tournoi = %s and Date_tournoi = %s"
+                    myCursor.execute(queryNbrJours, (Id_tournoi, maDate))
+                    nbrJours = myCursor.fetchall()[0][0]
+
+                    if nbrJours < 0:
+                        # Cela veut dire que le tournoi est passé
+                        pass
+                    else:
+                        # On supprime Id_cuis de la table cuisine afin qu'un autre cuisinier le remplace
+                        queryDeleteCuisine = "UPDATE CUISINE SET Id_cuis = NULL WHERE Id_cuis = %s AND Id_tournoi IN (SELECT Id_tournoi FROM TOURNOI WHERE Date_tournoi = %s)"
+                        myCursor.execute(queryDeleteCuisine,
+                                         (Id_cuis, Id_tournoi, maDate))
+                        cnx.commit()
 
             # On supprime Id_staff de CUISINIER
             queryDeleteCuisine = "UPDATE CUISINIER SET Id_staff = NULL WHERE Id_cuis = %s"
@@ -188,18 +200,25 @@ def main_chef(user_state, cnx, Id_Pers):
             Id_tech = myCursor.fetchall()[0][0]
 
             # On s'intéresse à la table NETTOIE
-            # On vérifie si la date de son netoyyage est passée
-            queryNbrJours = "SELECT DATEDIFF(Date_net, NOW()) FROM NETTOIE WHERE Id_tech = %s"
-            myCursor.execute(queryNbrJours, (Id_tech,))
-            nbrJours = myCursor.fetchall()[0][0]
+            # On vérifie si la date de son netoyage est passée
+            queryDateNet = "SELECT Date_net FROM NETTOIE WHERE Id_tech = %s"
+            myCursor.execute(queryDateNet, (Id_tech,))
+            DateList = myCursor.fetchall()
 
-            if nbrJours < 0:
-                # Cela veut dire que le nettoyage est passé
-                pass
-            else:
-                queryDeleteTechnicien = "UPDATE NETTOIE SET Id_tech = NULL WHERE Id_tech = %s"
-                myCursor.execute(queryDeleteTechnicien, (Id_tech,))
-                cnx.commit()
+            DateCursor = cnx.cursor()
+            for Date_net in DateList:
+                maDate = str(Date_net[0])
+                queryNbrJours = "SELECT DATEDIFF(Date_net, NOW()) FROM NETTOIE WHERE Id_tech = %s AND Date_net = %s"
+                DateCursor.execute(queryNbrJours, (Id_tech, maDate))
+                nbrJours = DateCursor.fetchall()[0][0]
+                if nbrJours < 0:
+                    # Cela veut dire que le nettoyage est passé
+                    pass
+                else:
+                    queryDeleteTechnicien = "UPDATE NETTOIE SET Id_tech = NULL WHERE Id_tech = %s  AND DATE_NET = %s"
+                    DateCursor.execute(
+                        queryDeleteTechnicien, (Id_tech, maDate))
+                    cnx.commit()
 
             # On supprime Id_staff de TECHNICIEN
             queryDeleteTechnicien = "UPDATE TECHNICIEN SET Id_staff = NULL WHERE Id_tech = %s"
@@ -242,11 +261,11 @@ def main_chef(user_state, cnx, Id_Pers):
         myCursor.execute(queryDelete, (Id_Pers,))
         cnx.commit()
         print("L'employé a bien été supprimé !")
-        main_chef(user_state, cnx)
+        main_chef(user_state, cnx, Id_Pers)
     else:
         print("Vous avez quitté l'application")
         sleep(1)
         exit()
 
     os.system("cls")
-    main_chef(user_state, cnx)
+    main_chef(user_state, cnx, Id_Pers)
