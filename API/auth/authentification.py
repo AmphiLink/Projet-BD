@@ -1,6 +1,7 @@
 from auth.hash import hash_password, verify_password
 from time import sleep
 from mysql.connector import (connection)
+import os
 
 
 def main_auth(cnx):
@@ -55,13 +56,17 @@ def login(cnx, Authorized):
         # On crée une liste contenant le nom et l'age de l'utilisateur
         UserInfosListe = []
         UserInfosListe = input(
-            "Entrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
-        PasswordLogin = input("Entrez votre mot de passe ")
+            "\nEntrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
+        PasswordLogin = input(
+            "Entrez votre mot de passe\nMot de pass oublié ? Tapez 1\n")
 
         if UserInfosListe[0] == "exit" or PasswordLogin == "exit":
             print("Vous avez quitté l'application")
             sleep(1)
             exit()
+
+        if PasswordLogin == "1":
+            reset_mdp(cnx, UserInfosListe)
 
         if len(UserInfosListe) != 2:
             login(cnx, Authorized)
@@ -295,3 +300,24 @@ def staffPrice(UserJob):
     else:
         UserPrice = 3000
     return UserPrice
+
+
+def reset_mdp(cnx, UserInfosListe):
+    os.system('cls')
+    newPassword = "Nothing"
+    newPasswordVerif = "Nothing2"
+    while newPassword != newPasswordVerif:
+        newPassword = input("Entrez votre nouveau mot de passe : ")
+        newPasswordVerif = input("Confirmez votre nouveau mot de passe : ")
+
+        if newPassword != newPasswordVerif:
+            print("Les mots de passe ne correspondent pas !")
+
+    newPassword = hash_password(newPassword)
+    myCursor = cnx.cursor(prepared=True)
+    query = "UPDATE PERSONNE SET Mot_de_passe = %s WHERE Nom = %s AND Age = %s"
+    myCursor.execute(
+        query, (newPassword, UserInfosListe[0], UserInfosListe[1]))
+    cnx.commit()
+    print("Votre mot de passe a bien été changé !")
+    login(cnx, Authorized=False)
