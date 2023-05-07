@@ -1,7 +1,7 @@
 -- *********************************************
 -- * SQL MySQL generation                      
 -- *--------------------------------------------
--- * DB-MAIN version: 11.0.2              
+-- * DB-MAIN version: 11.0.2             
 -- * Generator date: Sep 14 2021              
 -- * Generation date: Sat May  6 11:21:02 2023 
 -- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
@@ -488,3 +488,10 @@ create unique index FKde_IND
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
 
+select C.Id_cli as "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom as "Nom de l'équipe", Id_Tournoi, Id_emplacement 
+from CLIENT C, inscription I, ACTIVITE A, loue_emplacement L, EQUIPE E, participe P
+where C.Id_cli = I.Id_cli
+and I.Id_acti = A.Id_acti
+and C.Id_cli = L.Id_cli
+and C.Id_equipe = E.Id_equipe
+and E.Id_equipe = P.Id_equipe;
