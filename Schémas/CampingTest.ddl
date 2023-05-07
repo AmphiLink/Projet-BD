@@ -564,3 +564,12 @@ and S.Id_staff = C.Id_staff
 and CU.Id_cuis = C.Id_cuis
 and Prix_chef = null
 and CUISINIER != null;
+
+Create VIEW view_Administration AS
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
+from Staff S, Prenom P, PERSONNE PS, ADMINISTRATION AD, MATERIEL M, FICHE_COMPTA FC
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and AD.Id_admin = FC.Id_admin
+and AD.Id_admin = M.Id_admin
+and ADMINISTRATION != null;
