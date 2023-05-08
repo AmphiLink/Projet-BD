@@ -574,3 +574,48 @@ and PS.Id_Pers = S.Id_Pers
 and AD.Id_admin = FC.Id_admin
 and AD.Id_admin = M.Id_admin
 and ADMINISTRATION != null;
+
+create VIEW view_Administration AS
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
+from Staff S, Prenom P, PERSONNE PS, ADMINISTRATION AD, MATERIEL M, FICHE_COMPTA FC
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and AD.Id_admin = FC.Id_admin
+and AD.Id_admin = M.Id_admin
+and ADMINISTRATION != null;
+
+create VIEW view_Comptabilité_EMPLACEMENT AS
+select Date_debut, LE.Id_emplacement, Prix, C.Id_cli as "Id Client", Nom, Prenom 
+from loue_emplacement LE, EMPLACEMENT E, CLIENT C, PERSONNE P, PRENOM PR
+where LE.id_emplacement = E.Id_emplacement
+and LE.Id_cli = C.Id_cli
+and C.Id_Pers = P.Id_pers
+and PR.Id_Pers = P.Id_pers;
+
+create VIEW view_Comptabilité_MATERIEL AS
+select Date_loc as "Date de location", LM.Id_mat, Prix, C.Id_cli as "Id Client", P.Nom, Prenom 
+from Loue_mat LM, MATERIEL M, CLIENT C, PERSONNE P, PRENOM PR
+where M.Id_mat = LM.Id_mat
+and LM.Id_cli = C.Id_cli
+and C.Id_Pers = P.Id_pers
+and PR.Id_Pers = P.Id_pers;
+
+create VIEW view_Comptabilité_Emplacement AS
+select Date_debut, LE.Id_emplacement, Prix, C.Id_cli as "Id Client", Nom, Prenom 
+from loue_emplacement LE, EMPLACEMENT E, CLIENT C, PERSONNE P, PRENOM PR
+where LE.id_emplacement = E.Id_emplacement
+and LE.Id_cli = C.Id_cli
+and C.Id_Pers = P.Id_pers
+and PR.Id_Pers = P.Id_pers;
+
+create VIEW view_Comptabilité_STAFFChef AS
+select Id_staff, Prix as "Salaire"
+from Staff
+where Prix_chef != null
+and Employe_ = null;
+
+create VIEW view_Comptabilité_STAFFEmploye AS
+select Id_staff, Prix as "Salaire"
+from Staff
+where Prix_chef = null
+and Employe_ != null;
