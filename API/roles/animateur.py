@@ -32,7 +32,7 @@ def main_animateur(cnx, Id_Pers):
             exit()
         myCursor = cnx.cursor(prepared=True)
         # On récupère l'IdStaff
-        queryIdStaff = "Select Id_staff FROM STAFF where Id_Pers = %s"
+        queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
         myCursor.execute(queryIdStaff, (Id_Pers,))
         Id_staff = myCursor.fetchall()[0][0]
         # On récupère l'Idanim
@@ -78,10 +78,17 @@ def main_animateur(cnx, Id_Pers):
 
 
 def liste_activités(cnx):
-    # Encore à tester et commenter
+    """
+    Cette fonction permet d'afficher la liste des activités disponibles.
+
+    Parameters:
+    -----------
+    cnx : mysql.connector.connection.MySQLConnection (Object)
+    """
     myCursor = cnx.cursor(prepared=True)
     queryList = "SELECT Id_type_acti, Nom, Prix, Taille_min_, Age_min FROM TYPE_ACTI"
     myCursor.execute(queryList)
+    # On récupère les données et on les affiche
     for Id_type_acti, Nom, Prix, Taille_min_, Age_min in myCursor:
         print("%s :  %s, Prix : %s, Taille_min : %s, Age_min :  %s" %
               (Id_type_acti, Nom, Prix, Taille_min_, Age_min))

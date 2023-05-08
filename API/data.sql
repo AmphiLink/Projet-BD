@@ -87,7 +87,7 @@ create table FICHE_COMPTA (
      Id_fiche_compta int not null AUTO_INCREMENT,
      Date_fiche date not null,
      Prix_total float(1) not null,
-     Id_admin int not null,
+     Id_admin int not null,   
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
 
 create table inscription (

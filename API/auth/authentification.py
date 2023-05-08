@@ -55,6 +55,7 @@ def login(cnx, Authorized):
         myCursor = cnx.cursor(prepared=True)
         # On crée une liste contenant le nom et l'age de l'utilisateur
         UserInfosListe = []
+        PasswordLogin = ""
         UserInfosListe = input(
             "\nEntrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
         PasswordLogin = input(
@@ -66,9 +67,11 @@ def login(cnx, Authorized):
             exit()
 
         if PasswordLogin == "1":
+            # On appelle la fonction reset_mdp
             reset_mdp(cnx, UserInfosListe)
 
         if len(UserInfosListe) != 2:
+            # On recommence la boucle si l'utilisateur n'a pas rentré le bon nombre d'arguments
             login(cnx, Authorized)
 
         # On vérifie si l'utilisateur a rentré le bon nom et le bon âge
@@ -303,6 +306,14 @@ def staffPrice(UserJob):
 
 
 def reset_mdp(cnx, UserInfosListe):
+    """
+    Cette fonction permet de réinitialiser le mot de passe d'un utilisateur.
+
+    Parameters:
+    ----------
+    cnx : mysql.connector.connection_cext.CMySQLConnection (Object)
+    UserInfosListe : Liste contenant les informations de l'utilisateur (Noms et prénoms)(List)
+    """
     os.system('cls')
     newPassword = "Nothing"
     newPasswordVerif = "Nothing2"
@@ -320,4 +331,4 @@ def reset_mdp(cnx, UserInfosListe):
         query, (newPassword, UserInfosListe[0], UserInfosListe[1]))
     cnx.commit()
     print("Votre mot de passe a bien été changé !")
-    login(cnx, Authorized=False)
+    return login(cnx, Authorized=False)
