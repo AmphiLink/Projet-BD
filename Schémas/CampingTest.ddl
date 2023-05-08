@@ -1,7 +1,7 @@
 -- *********************************************
 -- * SQL MySQL generation                      
 -- *--------------------------------------------
--- * DB-MAIN version: 11.0.2             
+-- * DB-MAIN version: 11.0.2              
 -- * Generator date: Sep 14 2021              
 -- * Generation date: Sat May  6 11:21:02 2023 
 -- * LUN file: C:\Users\esteb\OneDrive\Bureau\Unif\2 ème année\Q2\BD 2\Projet-BD\Schémas\Camping-era.lun 
@@ -487,3 +487,4 @@ create unique index FKde_IND
 
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
+
