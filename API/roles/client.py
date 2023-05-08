@@ -46,7 +46,6 @@ def main_client(cnx, Id_pers):
         sleep(1)
         exit()
 
-
 def reserve_mat(cnx, Id_pers, Id_client):
     """
     Cette fonction permet de réserver du matériel.
@@ -91,7 +90,6 @@ def reserve_mat(cnx, Id_pers, Id_client):
     print("\nVous pouvez aller récupérer votre matériel !")
     sleep(3)
     main_client(cnx, Id_pers)
-
 
 def loue_emplacement(cnx, Id_pers):
     """
@@ -192,7 +190,6 @@ def loue_emplacement(cnx, Id_pers):
     sleep(3)
     main_client(cnx, Id_pers)
 
-
 def rejoindre_equipe(cnx, Id_pers):
     """
     Cette fonction permet de rejoindre une équipe.
@@ -247,7 +244,6 @@ def rejoindre_equipe(cnx, Id_pers):
             sleep(1)
             exit()
 
-
 def inscrire_activite(cnx, Id_pers):
     """
     Cette fonction permet d'inscrire un client à une activité.
@@ -261,7 +257,10 @@ def inscrire_activite(cnx, Id_pers):
     # On affiche les activités disponibles
     os.system("cls")
     print("\nVoici la liste des activités disponibles: \n")
-    print(resultats)
+    for resultat in resultats:
+        Id_type_acti = resultat[0]
+        Nom = resultat[1]
+        print(" Id:", Id_type_acti, "\n", "Nom:", Nom, "\n")
 
     # Pour obtenir plus d'informations sur une activité
     type_activity_id = input("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
@@ -272,17 +271,8 @@ def inscrire_activite(cnx, Id_pers):
         sleep(1)
         exit()
     else:
-    
-        queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
-        mycursor.execute(queryInfo)
-        resultatInfo = mycursor.fetchall()
-        for resultat in resultatInfo:
-            Date = resultat[0]
-            Heure = resultat[1]
-            Lieu = resultat[2]
-            print("Date:",Date,"\n", "Heure:",Heure, "\n", "Lieu:",Lieu, "\n")
         queryInfo = "SELECT Id_type_acti, Nom, Prix, Taille_min_, Age_min FROM TYPE_ACTI WHERE Id_type_acti = %s"
-        mycursor.execute(queryInfo)
+        mycursor.execute(queryInfo, (type_activity_id,))
         resultats = mycursor.fetchall()
         for resultat in resultats:
             Id_type_acti = resultat[0]
@@ -290,17 +280,31 @@ def inscrire_activite(cnx, Id_pers):
             Prix = resultat[2]
             Taille_min_ = resultat[3]
             Age_min = resultat[4]
-            print("Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min,"\n")
-
+            os.system("cls")
+            print(" Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min)        
+        queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
+        mycursor.execute(queryInfo, (type_activity_id,))
+        resultatInfo = mycursor.fetchall()
+        for resultat in resultatInfo:
+            Date = resultat[0]
+            Heure = resultat[1]
+            Lieu = resultat[2]
+            print(" Date:",Date,"\n", "Heure:",Heure, "\n", "Lieu:",Lieu, "\n")
 
     # Si le client veut s'inscrire à une activité
-    activity_id = input("Pour selectionner une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    activity_id = input("Pour selectionner cette activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
     os.system("cls")
     query = "SELECT Id_acti FROM ACTIVITE WHERE Id_type_acti = %s"
     mycursor.execute(query, (activity_id,))
     resultats = mycursor.fetchall()
-    if resultats == []:
-        print("L'activité n'existe pas")
+    if activity_id == "back":
+        main_client(cnx, Id_pers)
+    if activity_id == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
+    if activity_id not in resultats:
+        print("L'Id entré n'est pas valide, veuillez réessayer")
         sleep(2)
         inscrire_activite(cnx, Id_pers)
     
