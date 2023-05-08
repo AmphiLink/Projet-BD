@@ -255,7 +255,7 @@ def inscrire_activite(cnx, Id_pers):
     """
     # On récupère les activités disponibles
     mycursor = cnx.cursor(prepared=True)
-    query = "SELECT Id_type_acti, Nom FROM TYPE_ACTIVITE"
+    query = "SELECT Id_type_acti, Nom FROM TYPE_ACTI"
     mycursor.execute(query)
     resultats = mycursor.fetchall()
     # On affiche les activités disponibles
@@ -264,13 +264,34 @@ def inscrire_activite(cnx, Id_pers):
     print(resultats)
 
     # Pour obtenir plus d'informations sur une activité
-    print("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
-    queryInfo = "SELECT a.Date, a.Heure, a.Lieu, t.Id_type_acti, t.Nom, t.Prix, t.Taille_min_, t.Age_min FROM ACTIVITE a JOIN TYPE_ACTI t ON a.Id_type_acti = t.Id_type_acti"
-    mycursor.execute(queryInfo)
-    resultatInfo = mycursor.fetchall()
-    for resultat in resultatInfo:
-        Date, Heure, Lieu, Id_type_acti, Nom, Prix, Taille_min_, Age_min = resultat
-        print("Date: {}\nHeure: {}\nLieu: {}\nId: {}\nNom: {}\nPrix: {}\nTaille minimum: {}\nAge minimum: {}\n".format(Date, Heure, Lieu, Id_type_acti, Nom, Prix, Taille_min_, Age_min))
+    type_activity_id = input("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    if type_activity_id == "back":
+        main_client(cnx, Id_pers)
+    if type_activity_id == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
+    else:
+    
+        queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
+        mycursor.execute(queryInfo)
+        resultatInfo = mycursor.fetchall()
+        for resultat in resultatInfo:
+            Date = resultat[0]
+            Heure = resultat[1]
+            Lieu = resultat[2]
+            print("Date:",Date,"\n", "Heure:",Heure, "\n", "Lieu:",Lieu, "\n")
+        queryInfo = "SELECT Id_type_acti, Nom, Prix, Taille_min_, Age_min FROM TYPE_ACTI WHERE Id_type_acti = %s"
+        mycursor.execute(queryInfo)
+        resultats = mycursor.fetchall()
+        for resultat in resultats:
+            Id_type_acti = resultat[0]
+            Nom = resultat[1]
+            Prix = resultat[2]
+            Taille_min_ = resultat[3]
+            Age_min = resultat[4]
+            print("Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min,"\n")
+
 
     # Si le client veut s'inscrire à une activité
     activity_id = input("Pour selectionner une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
