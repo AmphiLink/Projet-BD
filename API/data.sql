@@ -43,12 +43,12 @@ create table ANIMATEUR (
 create table CLIENT (
      Id_cli int not null AUTO_INCREMENT,
      Id_Pers int not null,
-     Pays varchar(250) not null,
-     Code_postal int not null,
-     Ville varchar(250) not null,
-     Numero_de_maison int not null,
-     Con_Email varchar(250) not null,
-     Con_Telephone int not null,
+     Pays varchar(250),
+     Code_postal int,
+     Ville varchar(250),
+     Numero_de_maison int,
+     Con_Email varchar(250),
+     Con_Telephone int,
      Id_equipe int,
      constraint ID_CLIENT_ID primary key (Id_cli),
      constraint FKPER_CLI_ID unique (Id_Pers));
@@ -130,10 +130,10 @@ create table participe (
      constraint ID_participe_ID primary key (Id_tournoi, Id_equipe));
 
 create table PERSONNE (
-     Nom varchar(250) not null,
-     Age int not null,
+     Nom varchar(250),
+     Age int,
      Id_Pers int not null AUTO_INCREMENT,
-     Mot_de_passe varchar(250) not null,
+     Mot_de_passe varchar(250),
      STAFF int,
      CLIENT int,
      constraint ID_PERSONNE_ID primary key (Id_Pers));
@@ -145,8 +145,8 @@ create table peut_faire (
 
 create table Prenom (
      Id_Pers int not null,
-     Prenom varchar(250) not null,
-     constraint ID_Prenom_ID primary key (Id_Pers, Prenom));
+     Prenom varchar(250) null,
+     constraint ID_Prenom_ID primary key (Id_Pers));
 
 create table SECTEUR (
      Id_secteur int not null AUTO_INCREMENT,
@@ -489,6 +489,8 @@ create unique index FKde_IND
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
 
+--- Views Section
+
 create VIEW view_Client AS
 select C.Id_cli as "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom as "Nom de l'équipe", Id_Tournoi, Id_emplacement 
 from CLIENT C, inscription I, ACTIVITE A, loue_emplacement L, EQUIPE E, participe P
@@ -565,15 +567,6 @@ and S.Id_staff = C.Id_staff
 and CU.Id_cuis = C.Id_cuis
 and Prix_chef = null
 and CUISINIER != null;
-
-create VIEW view_Administration AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
-from Staff S, Prenom P, PERSONNE PS, ADMINISTRATION AD, MATERIEL M, FICHE_COMPTA FC
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and AD.Id_admin = FC.Id_admin
-and AD.Id_admin = M.Id_admin
-and ADMINISTRATION != null;
 
 create VIEW view_Administration AS
 select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
