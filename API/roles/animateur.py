@@ -13,18 +13,18 @@ def main_animateur(cnx, Id_Pers):
     """
 
     choix = "basic"
-    while choix not in ("liste_activités", "rajouter une compétence", "Rajouter une animation", "profil", "exit"):
+    while choix not in ("liste_activités", "rajouter une compétence", "rajouter une animation", "profil", "exit", "1", "2", "3", "4", "5"):
         choix = input(
-            "Que voulez vous faire ? (liste_activités, rajouter une compétence, rajouter une animation, profil, exit) ")
+            "Que voulez vous faire ?\n\n1: liste_activités\n2: rajouter une compétence\n3: rajouter une animation\n4: profil\n5: exit\n")
         sleep(1)
 
-    if choix == "liste_activités":
+    if choix == "liste_activités" or choix == "1":
         liste_activités(cnx)
-    elif choix == "rajouter une compétence":
+    elif choix == "rajouter une compétence" or choix == "2":
         os.system("cls")
         print("Choisissez une compétence à rajouter en tapant le numéro correspondant : ")
         NewJob = input(
-            "1 : Basketball 6 : Ski-nautique\n2 : Football   7 : Escalade\n3 :Badminton  8 : Mini-Golf\n4 : Volleyball 9 : Club enfants\n5 : Spa        10 : Plongée\n")
+            "\n1 : Basketball  6 : Ski-nautique\n2 : Football    7 : Escalade\n3 : Badminton   8 : Mini-Golf\n4 : Volleyball  9 : Club enfants\n5 : Spa         10 : Plongée\n")
 
         if NewJob == "exit":
             print("Vous avez quitté l'application")
@@ -43,12 +43,16 @@ def main_animateur(cnx, Id_Pers):
         queryAdd = "INSERT INTO peut_faire (Id_anim, Id_type_acti) VALUES (%s, %s)"
         myCursor.execute(queryAdd, (Id_anim, NewJob))
         cnx.commit()
-    elif choix == "Rajouter une animation":
+        print("Compétence ajoutée !")
+        sleep(1)
+        os.system("cls")
+
+    elif choix == "Rajouter une animation" or choix == "3":
         myCursor = cnx.cursor(prepared=True)
         os.system("cls")
         print("Choisissez une animation à rajouter en tapant le numéro correspondant : ")
         Id_type_acti = input(
-            "1 : Basketball 6 : Ski-nautique\n2 : Football   7 : Escalade\n3 :Badminton  8 : Mini-Golf\n4 : Volleyball 9 : Club enfants\n5 : Spa        10 : Plongée\n")
+            "\n1 : Basketball  6 : Ski-nautique\n2 : Football    7 : Escalade\n3 : Badminton   8 : Mini-Golf\n4 : Volleyball  9 : Club enfants\n5 : Spa         10 : Plongée\n")
         Date_acti = input("\nDate de l'animation (AAAA-MM-JJ) ?\n")
         Heure = input("\nHeure de l'animation (HH:MM) ?\n")
         Lieu = input("\nLieu de l'animation ?\n")
@@ -71,6 +75,10 @@ def main_animateur(cnx, Id_Pers):
         queryAddActi = "INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti, Id_anim) VALUES (%s, %s, %s, %s, %s)"
         myCursor.execute(queryAddActi, (Date_acti, Heure,
                          Lieu, Id_type_acti, Id_anim))
+        
+    if choix == "profil" or choix == "4":
+        return 
+        
     else:
         print("Vous avez quitté l'application")
         sleep(1)

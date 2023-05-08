@@ -253,5 +253,41 @@ def inscrire_activite(cnx, Id_pers):
     Cette fonction permet d'inscrire un client à une activité.
 
     """
+    # On récupère les activités disponibles
+    mycursor = cnx.cursor(prepared=True)
+    query = "SELECT Id_type_acti, Nom FROM TYPE_ACTIVITE"
+    mycursor.execute(query)
+    resultats = mycursor.fetchall()
+    # On affiche les activités disponibles
+    os.system("cls")
+    print("\nVoici la liste des activités disponibles: \n")
+    print(resultats)
+
+    # Pour obtenir plus d'informations sur une activité
+    print("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    queryInfo = "SELECT a.Date, a.Heure, a.Lieu, t.Id_type_acti, t.Nom, t.Prix, t.Taille_min_, t.Age_min FROM ACTIVITE a JOIN TYPE_ACTI t ON a.Id_type_acti = t.Id_type_acti"
+    mycursor.execute(queryInfo)
+    resultatInfo = mycursor.fetchall()
+    for resultat in resultatInfo:
+        Date, Heure, Lieu, Id_type_acti, Nom, Prix, Taille_min_, Age_min = resultat
+        print("Date: {}\nHeure: {}\nLieu: {}\nId: {}\nNom: {}\nPrix: {}\nTaille minimum: {}\nAge minimum: {}\n".format(Date, Heure, Lieu, Id_type_acti, Nom, Prix, Taille_min_, Age_min))
+
     # Si le client veut s'inscrire à une activité
-    return 0
+    activity_id = input("Pour selectionner une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    os.system("cls")
+    query = "SELECT Id_acti FROM ACTIVITE WHERE Id_type_acti = %s"
+    mycursor.execute(query, (activity_id,))
+    resultats = mycursor.fetchall()
+    if resultats == []:
+        print("L'activité n'existe pas")
+        sleep(2)
+        inscrire_activite(cnx, Id_pers)
+    
+    # On inscrit le client à l'activité
+    query = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
+    mycursor.execute(query, (Id_pers,))
+    Id_cli = mycursor.fetchall()[0][0]
+    query = "INSERT INTO inscription (Id_cli, Id_acti) VALUES (%s, %s)"
+    mycursor.execute(query, (Id_cli, activity_id))
+    cnx.commit()
+    print("Vous êtes bien inscrit à l'activité !")
