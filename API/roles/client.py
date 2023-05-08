@@ -16,8 +16,8 @@ def main_client(cnx, Id_pers):
 
     choix = "basic"
     os.system("cls")
-    while choix not in ("Reserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "profil", "exit", "1", "2", "3", "4", "5", "6", "7"):
-        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: profil\n 7: exit\n ")
+    while choix not in ("Reserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7"):
+        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: S'inscrire à un tournoi\n 7: profil\n 8: exit\n")
         os.system("cls")
 
     myCursor = cnx.cursor(prepared=True)
@@ -40,6 +40,9 @@ def main_client(cnx, Id_pers):
 
     elif choix == "S'inscrire à une activité" or choix == "5":
         inscrire_activite(cnx, Id_pers)
+
+    elif choix == "S'inscrire à un tournoi" or choix == "6":
+        inscrire_tournoi(cnx, Id_pers)
 
     elif choix == "exit" or choix == "7":
         print("Vous avez quitté l'application !")
@@ -316,3 +319,49 @@ def inscrire_activite(cnx, Id_pers):
     mycursor.execute(query, (Id_cli, activity_id))
     cnx.commit()
     print("Vous êtes bien inscrit à l'activité !")
+
+def inscrire_tournoi(cnx, Id_pers):
+    """
+    NE FONCTIONNE PAS ENCORE !!!!
+    Cette fonction permet d'inscrire un client à un tournoi.
+
+    """
+    # On récupère les tournois disponibles
+    mycursor = cnx.cursor(prepared=True)
+    query = "SELECT Id_tournoi FROM TOURNOI WHERE (SELECT Id_)"
+    mycursor.execute(query)
+    resultats = mycursor.fetchall()
+    # On affiche les tournois disponibles
+    os.system("cls")
+    print("\nVoici la liste des tournois disponibles: \n")
+    for resultat in resultats:
+        Id_tournoi = resultat[0]
+        Nom = resultat[1]
+        print(" Id:", Id_tournoi, "\n", "Nom:", Nom, "\n")
+
+    # Pour obtenir plus d'informations sur un tournoi
+    tournoi_id = input("Si vous voulez plus d'informations sur un tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    if tournoi_id == "back":
+        main_client(cnx, Id_pers)
+    if tournoi_id == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
+    else:
+        queryInfo = "SELECT Id_tournoi, Nom, Prix, Taille_min_, Age_min FROM TOURNOI WHERE Id_tournoi = %s"
+        mycursor.execute(queryInfo, (tournoi_id,))
+        resultats = mycursor.fetchall()
+        for resultat in resultats:
+            Id_tournoi = resultat[0]
+            Nom = resultat[1]
+            Prix = resultat[2]
+            Taille_min_ = resultat[3]
+            Age_min = resultat[4]
+            os.system("cls")
+            print(" Id:",Id_tournoi,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min)        
+        queryInfo = "SELECT Date_tournoi, Heure, Lieu FROM TOURNOI WHERE Id_tournoi = %s"
+        mycursor.execute(queryInfo, (tournoi_id,))
+        resultatInfo = mycursor.fetchall()
+        for resultat in resultatInfo:
+            Date = resultat[0]
+            Heure = resultat

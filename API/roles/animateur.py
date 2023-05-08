@@ -16,6 +16,7 @@ def main_animateur(cnx, Id_Pers):
     while choix not in ("liste_activités", "rajouter une compétence", "rajouter une animation", "profil", "exit", "1", "2", "3", "4", "5"):
         choix = input(
             "Que voulez vous faire ?\n\n1: liste_activités\n2: rajouter une compétence\n3: rajouter une animation\n4: profil\n5: exit\n")
+        os.system("cls")
         sleep(1)
 
     if choix == "liste_activités" or choix == "1":
@@ -47,15 +48,15 @@ def main_animateur(cnx, Id_Pers):
         sleep(1)
         os.system("cls")
 
-    elif choix == "Rajouter une animation" or choix == "3":
+    elif choix == "rajouter une animation" or choix == "3":
         myCursor = cnx.cursor(prepared=True)
         os.system("cls")
         print("Choisissez une animation à rajouter en tapant le numéro correspondant : ")
         Id_type_acti = input(
             "\n1 : Basketball  6 : Ski-nautique\n2 : Football    7 : Escalade\n3 : Badminton   8 : Mini-Golf\n4 : Volleyball  9 : Club enfants\n5 : Spa         10 : Plongée\n")
-        Date_acti = input("\nDate de l'animation (AAAA-MM-JJ) ?\n")
-        Heure = input("\nHeure de l'animation (HH:MM) ?\n")
-        Lieu = input("\nLieu de l'animation ?\n")
+        Date_acti = input("\nDate de l'animation (AAAA-MM-JJ) ?")
+        Heure = input("\nHeure de l'animation (HH:MM) ?")
+        Lieu = input("\nLieu de l'animation ?")
 
         if Id_type_acti == "exit" or Date_acti == "exit" or Heure == "exit" or Lieu == "exit":
             print("Vous avez quitté l'application")
@@ -98,7 +99,7 @@ def liste_activités(cnx):
     myCursor.execute(queryList)
     # On récupère les données et on les affiche
     for Id_type_acti, Nom, Prix, Taille_min_, Age_min in myCursor:
-        print("%s :  %s, Prix : %s, Taille_min : %s, Age_min :  %s" %
+        print("%s : %s\nPrix : %s\nTaille minimum : %s\nAge minimum : %s\n" %
               (Id_type_acti, Nom, Prix, Taille_min_, Age_min))
-    stop = input("Appuyez sur une touche pour continuer")
+    sleep(4)
     os.system("cls")
