@@ -489,3 +489,88 @@ create unique index FKde_IND
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
 
+create VIEW view_Client AS
+select C.Id_cli as "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom as "Nom de l'équipe", Id_Tournoi, Id_emplacement 
+from CLIENT C, inscription I, ACTIVITE A, loue_emplacement L, EQUIPE E, participe P
+where C.Id_cli = I.Id_cli
+and I.Id_acti = A.Id_acti
+and C.Id_cli = L.Id_cli
+and C.Id_equipe = E.Id_equipe
+and E.Id_equipe = P.Id_equipe;
+
+create VIEW view_Chef_Animateur AS
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
+from Staff S, Prenom P, PERSONNE PS
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and Prix_chef != null
+and ANIMATEUR != null;
+
+create VIEW view_Animateur_PossibleActivite AS
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, PF.Id_type_acti as "Type de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
+from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and S.Id_staff = A.Id_anim
+and A.Id_anim = PF.Id_anim
+and TA.Id_type_acti = PF.Id_type_acti
+and Prix_chef = null
+and ANIMATEUR != null;
+
+create VIEW view_Animateur_Activite AS
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, Date_Acti as "Date", Heure, Lieu, PF.Id_type_acti, TA.Nom as "Nom de l'activité", TA.Prix "Prix de l'activité", Taille_min_ "Taille minimum", Age_min as "Age minimum"
+from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA, ACTIVITE ACT
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and S.Id_staff = A.Id_anim
+and A.Id_anim = PF.Id_anim
+and ACT.Id_anim = A.Id_anim
+and TA.Id_type_acti = ACT.Id_type_acti
+and Prix_chef = null
+and ANIMATEUR != null;
+
+create VIEW view_Chef_Technicien AS
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
+from Staff S, Prenom P, PERSONNE PS
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and Prix_chef != null
+and TECHNICIEN != null;
+
+create VIEW view_Employé_Technicien AS
+select S.Id_staff, PS.Nom as "Nom", Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe, T.Id_tech, Date_Net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
+from Staff S, Prenom P, PERSONNE PS, TECHNICIEN T, NETTOIE N, SECTEUR SC
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and S.Id_staff = T.Id_staff
+and T.Id_tech = N.Id_tech
+and N.Id_secteur = SC.Id_secteur  
+and Prix_chef = null
+and TECHNICIEN != null;
+
+create VIEW view_Chef_Cuisinier AS
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
+from Staff S, Prenom P, PERSONNE PS
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and Prix_chef != null
+and CUISINIER != null;
+
+create VIEW view_Cuisinier AS
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe, Id_cuisine,  Id_emplacement, Id_tournoi
+from Staff S, Prenom P, PERSONNE PS, CUISINIER C , cuisine CU
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and S.Id_staff = C.Id_staff
+and CU.Id_cuis = C.Id_cuis
+and Prix_chef = null
+and CUISINIER != null;
+
+create VIEW view_Administration AS
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
+from Staff S, Prenom P, PERSONNE PS, ADMINISTRATION AD, MATERIEL M, FICHE_COMPTA FC
+where PS.Id_Pers = P.Id_Pers
+and PS.Id_Pers = S.Id_Pers
+and AD.Id_admin = FC.Id_admin
+and AD.Id_admin = M.Id_admin
+and ADMINISTRATION != null;
