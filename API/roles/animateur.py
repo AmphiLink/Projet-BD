@@ -2,6 +2,7 @@ from time import sleep
 import os
 
 
+
 def main_animateur(cnx, Id_Pers):
     """
     Cette fonction permet d'utiliser les différentes fonctionnnalités de l'application en tant qu'animateur.
@@ -86,7 +87,7 @@ def main_animateur(cnx, Id_Pers):
         exit()
 
 
-def liste_activités(cnx):
+def liste_activités(cnx, Id_Pers):
     """
     Cette fonction permet d'afficher la liste des activités disponibles.
 
@@ -103,3 +104,4 @@ def liste_activités(cnx):
               (Id_type_acti, Nom, Prix, Taille_min_, Age_min))
     sleep(4)
     os.system("cls")
+    main_animateur(cnx, Id_Pers)
