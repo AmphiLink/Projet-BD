@@ -87,7 +87,7 @@ create table FICHE_COMPTA (
      Id_fiche_compta int not null AUTO_INCREMENT,
      Date_fiche date not null,
      Prix_total float(1) not null,
-     Id_admin int not null,   
+     Id_admin int,   
      constraint ID_FICHE_COMPTA_ID primary key (Id_fiche_compta));
 
 create table inscription (
@@ -488,6 +488,8 @@ create unique index FKde_IND
 
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
+
+--- Dump Section
 
 --- Views Section
 

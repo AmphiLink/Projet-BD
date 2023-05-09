@@ -3,9 +3,9 @@ from time import sleep
 
 def main_admin(cnx, Id_pers):
     choix = "basic"
-    while choix not in ("gérer une fiche compta", "rajouter un matériel", "gérer un matériel", "liste des clients", "supprimer un client", "profil", "exit"):
+    while choix not in ("gérer une fiche compta", "rajouter un matériel", "gérer un matériel", "liste des clients", "supprimer un client", "profil", "regarder la compta de l'année", "Evolution de la compta annuelle", "exit"):
         choix = input(
-            "Que voulez vous faire ? (gérer une fiche compta, rajouter un matérie, gérer un matériel, liste des clients, supprimer un client, profil, exit) \n")
+            "Que voulez vous faire ? (gérer une fiche compta, rajouter un matérie, gérer un matériel, liste des clients, supprimer un client, profil, regarder la compta de l'année, Evolution de la compta annuelle ,exit) \n")
         sleep(1)
 
     myCursor = cnx.cursor()
@@ -37,6 +37,7 @@ def main_admin(cnx, Id_pers):
 
         Id_fiche_compta = input(
             "Quelle fiche compta voulez-vous gérer ? (Tapez le numéro de la fiche)\n")
+        Id_fiche_compta = int(Id_fiche_compta)
 
         # On vérifie que le numéro est bon
         queryVerifIdFiche = "SELECT Id_fiche_compta FROM FICHE_COMPTA WHERE Id_fiche_compta = %s"
@@ -105,6 +106,56 @@ def main_admin(cnx, Id_pers):
         for i in range(len(listeClient)):
             print("Id : ", listeClient[i][0], "\nNom : ", listeClient[i][1], "\nPrénom : ", listeClient[i][2], "\nNuméro de téléphone : ",
                   listeClient[i][3], "\nEmail : ", listeClient[i][4], "\nPays : ", listeClient[i][5], "\nVille : ", listeClient[i][6], "\n ------------------------------- \n")
+
+    elif choix == "regarder la compta de l'année":
+        myCursor = cnx.cursor()
+        année = input(
+            "De quelle année voulez-vous regarder la compta ? (YYYY-MM-JJ)\n")
+        année = année + "%"
+
+        queryCheckFichesCompta = "SELECT SUM(Prix_total) FROM  FICHE_COMPTA WHERE Date_fiche LIKE %s"
+        myCursor.execute(queryCheckFichesCompta, (année,))
+        checkFichesCompta = myCursor.fetchall()
+
+        if checkFichesCompta == []:
+            print("Il n'y a pas de fiche compta pour cette année !")
+            main_admin(cnx, Id_pers)
+
+        checkFichesCompta = checkFichesCompta[0][0]
+
+        if checkFichesCompta == None:
+            checkFichesCompta = 0
+
+        print("La compta de l'année", année,
+              "est de", checkFichesCompta, "€")
+
+    elif choix == "Evolution de la compta annuelle":
+        myCursor = cnx.cursor()
+
+        année = input(
+            "De quelle année voulez-vous regarder l'évolution de la compta ? (YYYY-MM-JJ)\n")
+
+        # Pour chaque mois de l'année donnée par l'utilisateur on affiche la compta la date est de format YYYY-MM-JJ
+
+        for i in range(1, 13):
+            if i < 10:
+                i = "0" + str(i)
+            queryCheckFichesCompta = "SELECT SUM(Prix_total) FROM  FICHE_COMPTA WHERE Date_fiche LIKE %s"
+            myCursor.execute(queryCheckFichesCompta,
+                             (année + "-" + str(i) + "%",))
+            checkFichesCompta = myCursor.fetchall()
+
+            if checkFichesCompta == []:
+                print("Il n'y a pas de fiche compta pour cette année !")
+                main_admin(cnx, Id_pers)
+
+            checkFichesCompta = checkFichesCompta[0][0]
+
+            if checkFichesCompta == None:
+                checkFichesCompta = 0
+
+            print("La compta du mois", i, "de l'année",
+                  année, "est de", checkFichesCompta, "€")
 
     else:
         myCursor = cnx.cursor()
