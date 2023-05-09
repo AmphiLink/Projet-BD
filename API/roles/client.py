@@ -16,8 +16,8 @@ def main_client(cnx, Id_pers):
 
     choix = "basic"
     os.system("cls")
-    while choix not in ("Reserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "profil", "exit", "1", "2", "3", "4", "5", "6", "7"):
-        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: profil\n 7: exit\n ")
+    while choix not in ("Reserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7"):
+        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: S'inscrire à un tournoi\n 7: profil\n 8: exit\n")
         os.system("cls")
 
     myCursor = cnx.cursor(prepared=True)
@@ -36,16 +36,18 @@ def main_client(cnx, Id_pers):
         rejoindre_equipe(cnx, Id_pers)
 
     elif choix == "Voir la liste des activités" or choix == "4":
-        liste_activités(cnx)
+        liste_activités(cnx, Id_pers)
 
     elif choix == "S'inscrire à une activité" or choix == "5":
         inscrire_activite(cnx, Id_pers)
+
+    elif choix == "S'inscrire à un tournoi" or choix == "6":
+        inscrire_tournoi(cnx, Id_pers)
 
     elif choix == "exit" or choix == "7":
         print("Vous avez quitté l'application !")
         sleep(1)
         exit()
-
 
 def reserve_mat(cnx, Id_pers, Id_client):
     """
@@ -68,7 +70,7 @@ def reserve_mat(cnx, Id_pers, Id_client):
 
     if myCursor.fetchall() == []:
         print("Le matériel n'existe pas")
-        sleep(10)
+        sleep(2)
         main_client(cnx, Id_pers)
 
     Date_debut = input(
@@ -91,7 +93,6 @@ def reserve_mat(cnx, Id_pers, Id_client):
     print("\nVous pouvez aller récupérer votre matériel !")
     sleep(3)
     main_client(cnx, Id_pers)
-
 
 def loue_emplacement(cnx, Id_pers):
     """
@@ -192,7 +193,6 @@ def loue_emplacement(cnx, Id_pers):
     sleep(3)
     main_client(cnx, Id_pers)
 
-
 def rejoindre_equipe(cnx, Id_pers):
     """
     Cette fonction permet de rejoindre une équipe.
@@ -247,11 +247,185 @@ def rejoindre_equipe(cnx, Id_pers):
             sleep(1)
             exit()
 
-
 def inscrire_activite(cnx, Id_pers):
     """
     Cette fonction permet d'inscrire un client à une activité.
 
     """
+    # On récupère les activités disponibles
+    mycursor = cnx.cursor(prepared=True)
+    query = "SELECT Id_type_acti, Nom FROM TYPE_ACTI"
+    mycursor.execute(query)
+    resultats = mycursor.fetchall()
+    # On affiche les activités disponibles
+    os.system("cls")
+    print("\nVoici la liste des activités disponibles: \n")
+    for resultat in resultats:
+        Id_type_acti = resultat[0]
+        Nom = resultat[1]
+        print(" Id:", Id_type_acti, "\n", "Nom:", Nom, "\n")
+
+    # Pour obtenir plus d'informations sur une activité
+    type_activity_id = input("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    if type_activity_id == "back":
+        main_client(cnx, Id_pers)
+    if type_activity_id == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
+    else:
+        queryInfo = "SELECT Id_type_acti, Nom, Prix, Taille_min_, Age_min FROM TYPE_ACTI WHERE Id_type_acti = %s"
+        mycursor.execute(queryInfo, (type_activity_id,))
+        resultats = mycursor.fetchall()
+        for resultat in resultats:
+            Id_type_acti = resultat[0]
+            Nom = resultat[1]
+            Prix = resultat[2]
+            Taille_min_ = resultat[3]
+            Age_min = resultat[4]
+            os.system("cls")
+            print(" Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min)        
+        queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
+        mycursor.execute(queryInfo, (type_activity_id,))
+        resultatInfo = mycursor.fetchall()
+        for resultat in resultatInfo:
+            Date = resultat[0]
+            Heure = resultat[1]
+            Lieu = resultat[2]
+            print(" Date:",Date,"\n", "Heure:",Heure, "\n", "Lieu:",Lieu, "\n")
+
     # Si le client veut s'inscrire à une activité
-    return 0
+    activity_id = input("Pour selectionner cette activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    os.system("cls")
+    query = "SELECT Id_acti FROM ACTIVITE WHERE Id_type_acti = %s"
+    mycursor.execute(query, (activity_id,))
+    resultats = mycursor.fetchall()
+    if activity_id == "back":
+        main_client(cnx, Id_pers)
+    if activity_id == "exit":
+        print("Vous avez quitté l'application")
+        sleep(1)
+        exit()
+    if activity_id not in resultats:
+        print("L'Id entré n'est pas valide, veuillez réessayer")
+        sleep(2)
+        inscrire_activite(cnx, Id_pers)
+    
+    # On inscrit le client à l'activité
+    query = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
+    mycursor.execute(query, (Id_pers,))
+    Id_cli = mycursor.fetchall()[0][0]
+    query = "INSERT INTO inscription (Id_cli, Id_acti) VALUES (%s, %s)"
+    mycursor.execute(query, (Id_cli, activity_id))
+    cnx.commit()
+    print("Vous êtes bien inscrit à l'activité !")
+
+def inscrire_tournoi(cnx, Id_pers):
+    """
+    NE FONCTIONNE PAS ENCORE !!!!
+    Cette fonction permet d'inscrire un client à un tournoi.
+
+    """
+    # On vérifie si le client possède une équipe
+    mycursor = cnx.cursor(prepared=True)
+    query = "SELECT Id_equipe FROM CLIENT WHERE Id_Pers = %s"
+    mycursor.execute(query, (Id_pers,))
+    Id_equipe = mycursor.fetchall()[0][0]
+    if Id_equipe == None:
+        print("Vous n'avez pas d'équipe, veuillez en créer une")
+        sleep(2)
+        rejoindre_equipe(cnx, Id_pers)
+    else:   
+        # On récupère les tournois disponibles
+        mycursor = cnx.cursor(prepared=True)
+        query = "SELECT Id_tournoi, Id_acti FROM TOURNOI"
+        mycursor.execute(query)
+        resultats = mycursor.fetchall()
+        os.system("cls")
+        print("\nVoici la liste des tournois disponibles: \n")
+        for resultat in resultats:
+            Id_tournoi = resultat[0]
+            Id_acti = resultat[1]
+            query = "SELECT Id_type_acti FROM ACTIVITE WHERE Id_acti = %s"
+            mycursor.execute(query, (Id_acti,))
+            Id_type_acti = mycursor.fetchall()[0][0]
+            query = "SELECT Nom FROM TYPE_ACTI WHERE Id_type_acti = %s"
+            mycursor.execute(query, (Id_type_acti,))
+            Nom = mycursor.fetchall()[0][0]
+            print(" Id:", Id_tournoi, "\n", "Nom:", Nom, "\n")
+        
+
+        # Pour obtenir plus d'informations sur un tournoi
+        tournoi_id = input("Si vous voulez plus d'informations sur un tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+                
+        # On vérifie que l'Id entré est valide
+        query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
+        mycursor.execute(query, (tournoi_id,))
+        resultats = mycursor.fetchall()
+        if not resultats:
+            os.system("cls")
+            print("L'Id entré n'est pas valide, veuillez réessayer")
+            sleep(2)
+            inscrire_tournoi(cnx, Id_pers)   
+        
+        if tournoi_id == "back":
+            main_client(cnx, Id_pers)
+        if tournoi_id == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
+
+        else:
+            # On affiche le nom du sport
+            query = "SELECT Nom FROM TYPE_ACTI WHERE (SELECT Id_acti FROM TOURNOI WHERE Id_tournoi = %s)"
+            mycursor.execute(query, (tournoi_id,))
+            Nom = mycursor.fetchall()[0][0]
+            # On affiche les informations du tournoi
+            queryInfo = "SELECT Id_tournoi, Id_acti, Date_tournoi, Heure, Lieu, Prix FROM TOURNOI WHERE Id_tournoi = %s"
+            mycursor.execute(queryInfo, (tournoi_id,))
+            resultats = mycursor.fetchall()
+            for resultat in resultats:
+                Id_tournoi = resultat[0]
+                Date_tournoi = resultat[2]
+                Heure = resultat[3]
+                Lieu = resultat[4]
+                Prix = resultat[5]
+                os.system("cls")
+            print(" Id:",Id_tournoi,"\n","Nom:",Nom,"\n","Date_tournoi:",Date_tournoi,"\n", "Heure:",Heure,"\n", "Lieu:",Lieu,"\n", "Prix:",Prix)    
+
+        # Si le client veut s'inscrire à un tournoi
+        tournoi_id = input("\nPour selectionner ce tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+        os.system("cls")
+        query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
+        mycursor.execute(query,(tournoi_id,))
+        resultats = mycursor.fetchall()
+        if tournoi_id == "back":
+            inscrire_tournoi(cnx, Id_pers)
+
+        if tournoi_id == "exit":
+            print("Vous avez quitté l'application")
+            sleep(1)
+            exit()
+
+        # On vérifie que l'Id entré est valide
+        query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
+        mycursor.execute(query, (tournoi_id,))
+        resultats = mycursor.fetchall()
+        if not resultats:
+            os.system("cls")
+            print("L'Id entré n'est pas valide, veuillez réessayer")
+            sleep(2)
+            inscrire_tournoi(cnx, Id_pers)  
+        
+        else:
+            # On récupère l'Id de l'équipe du client
+            query = "SELECT Id_equipe FROM CLIENT WHERE Id_Pers = %s"
+            mycursor.execute(query, (Id_pers,))
+            Id_equipe = mycursor.fetchall()[0][0]
+
+            # On INSERT dans la table PARTICIPE
+            query = "INSERT INTO participe (Id_equipe, Id_tournoi) VALUES (%s, %s)"
+            mycursor.execute(query, (Id_equipe, tournoi_id))
+            cnx.commit()
+            print("Vous êtes bien inscrit au tournoi !")
+            
