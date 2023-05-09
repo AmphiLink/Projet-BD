@@ -498,16 +498,10 @@ and C.Id_cli = L.Id_cli
 and C.Id_equipe = E.Id_equipe
 and E.Id_equipe = P.Id_equipe;
 
-create VIEW view_Chef_Animateur AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
-from Staff S, Prenom P, PERSONNE PS
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and Prix_chef != null
-and ANIMATEUR != null;
+
 
 create VIEW view_Animateur_PossibleActivite AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, PF.Id_type_acti as "Type de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", PF.Id_type_acti as "Type de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
 from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
@@ -515,10 +509,11 @@ and S.Id_staff = A.Id_anim
 and A.Id_anim = PF.Id_anim
 and TA.Id_type_acti = PF.Id_type_acti
 and Prix_chef = null
-and ANIMATEUR != null;
+and ANIMATEUR != null
+group by S.Id_staff;
 
 create VIEW view_Animateur_Activite AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, Date_Acti as "Date", Heure, Lieu, PF.Id_type_acti, TA.Nom as "Nom de l'activité", TA.Prix "Prix de l'activité", Taille_min_ "Taille minimum", Age_min as "Age minimum"
+select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Date_Acti as "Date", Heure, Lieu, PF.Id_type_acti, TA.Nom as "Nom de l'activité", TA.Prix "Prix de l'activité", Taille_min_ "Taille minimum", Age_min as "Age minimum"
 from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA, ACTIVITE ACT
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
@@ -527,18 +522,11 @@ and A.Id_anim = PF.Id_anim
 and ACT.Id_anim = A.Id_anim
 and TA.Id_type_acti = ACT.Id_type_acti
 and Prix_chef = null
-and ANIMATEUR != null;
-
-create VIEW view_Chef_Technicien AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
-from Staff S, Prenom P, PERSONNE PS
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and Prix_chef != null
-and TECHNICIEN != null;
+and ANIMATEUR != null
+group by S.Id_staff;
 
 create VIEW view_Employé_Technicien AS
-select S.Id_staff, PS.Nom as "Nom", Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe, T.Id_tech, Date_Net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
+select S.Id_staff, PS.Nom as "Nom", Prenom, Age, S.Id_pers, Prix as "Salaire", T.Id_tech, Date_Net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
 from Staff S, Prenom P, PERSONNE PS, TECHNICIEN T, NETTOIE N, SECTEUR SC
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
@@ -548,16 +536,18 @@ and N.Id_secteur = SC.Id_secteur
 and Prix_chef = null
 and TECHNICIEN != null;
 
-create VIEW view_Chef_Cuisinier AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe
+create VIEW view_Chef AS
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire"
 from Staff S, Prenom P, PERSONNE PS
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
 and Prix_chef != null
-and CUISINIER != null;
+and CUISINIER != null
+or TECHNICIEN != null
+or ANIMATEUR != null;
 
 create VIEW view_Cuisinier AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Mot_de_passe, Id_cuisine,  Id_emplacement, Id_tournoi
+select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Id_cuisine,  Id_emplacement, Id_tournoi
 from Staff S, Prenom P, PERSONNE PS, CUISINIER C , cuisine CU
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
@@ -619,3 +609,5 @@ select Id_staff, Prix as "Salaire"
 from Staff
 where Prix_chef = null
 and Employe_ != null;
+
+INSERT INTO client VALUES ('valeur 1', 'valeur 2', ...)
