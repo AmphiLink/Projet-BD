@@ -267,12 +267,14 @@ def inscrire_activite(cnx, Id_pers):
 
     # Pour obtenir plus d'informations sur une activité
     type_activity_id = input("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    # Si le client veut revenir au menu principal
     if type_activity_id == "back":
         main_client(cnx, Id_pers)
     if type_activity_id == "exit":
         print("Vous avez quitté l'application")
         sleep(1)
         exit()
+    # Si le client veut plus d'informations sur une activité
     else:
         queryInfo = "SELECT Id_type_acti, Nom, Prix, Taille_min_, Age_min FROM TYPE_ACTI WHERE Id_type_acti = %s"
         mycursor.execute(queryInfo, (type_activity_id,))
@@ -285,6 +287,7 @@ def inscrire_activite(cnx, Id_pers):
             Age_min = resultat[4]
             os.system("cls")
             print(" Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min)        
+        # On affiche les informations sur l'activité
         queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
         mycursor.execute(queryInfo, (type_activity_id,))
         resultatInfo = mycursor.fetchall()
@@ -399,6 +402,8 @@ def inscrire_tournoi(cnx, Id_pers):
         query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
         mycursor.execute(query,(tournoi_id,))
         resultats = mycursor.fetchall()
+
+        # Si le client veut revenir en arrière
         if tournoi_id == "back":
             inscrire_tournoi(cnx, Id_pers)
 
@@ -429,3 +434,28 @@ def inscrire_tournoi(cnx, Id_pers):
             cnx.commit()
             print("Vous êtes bien inscrit au tournoi !")
             
+def profil(cnx, Id_pers):
+    """
+    A MODIFIER AVEC LES VUES
+    Cette fonction permet d'afficher le profil d'un client.
+    """
+    # Si le client veut modifier son profil
+    os.system("cls")
+    print("Si vous voulez modifier votre profil, entrez 'modif', sinon entrez 'back' pour revenir au menu principal")
+    choix = input()
+    query = "SELECT ... FROM VIEW .... WHERE Id_Pers = %s"
+    mycursor.execute(query, (Id_pers,))
+    resultats = mycursor.fetchall()
+    if choix == "modif":
+        print("Quel champ voulez-vous modifier ?")
+        for resultat in resultats:
+            print(resultat)
+        champ = input()
+        print("Quelle valeur voulez-vous mettre ?")
+        valeur = input()
+        query = "UPDATE CLIENT SET %s = %s WHERE Id_Pers = %s"
+        mycursor.execute(query, (champ, valeur, Id_pers))
+        cnx.commit()
+        print("Votre profil a bien été modifié !")
+        sleep(2)
+        main_client(cnx, Id_pers)
