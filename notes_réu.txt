@@ -91,6 +91,13 @@ Questions Pol Benats :
 -structure d'un projet en python
 -Problème inserion de données
 
+Questions 2 Pol :
+
+Quid des vues ?
+Insertion de données avec un mot de passe hashé
+problème login
+et reset password
+
 Remarque importante :
 Lorsqu'un cuisinier cuisine pour un emplacement il n'ya pas de date car il devient cuisinier attitré de l'emplacement jusqu'à ce qu'il résilie décide d'arrêter de cuisiner
 pour cet emplacement
