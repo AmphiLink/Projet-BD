@@ -20,6 +20,9 @@ def main_auth(cnx):
     Id_Pers : L'id de l'utilisateur dans la base de données(table PERSONNE) (int)
     """
     Connexion_type = "nothing"
+    chef_state = False
+    user_state = ""
+    Id_Pers = 1
     while Connexion_type not in ("login", "register", "exit"):
         Connexion_type = input(
             "Entrez 'login'.Vous n'avez pas de compte ? Entrez 'register'\n")
@@ -28,6 +31,7 @@ def main_auth(cnx):
         chef_state, user_state, Id_Pers = login(cnx, Authorized=False)
     elif Connexion_type == "register":
         register(cnx)
+
     else:
         print("\nVous avez quitté l'application")
         sleep(1)
@@ -54,21 +58,24 @@ def login(cnx, Authorized):
 
         myCursor = cnx.cursor(prepared=True)
         # On crée une liste contenant le nom et l'age de l'utilisateur
+        PasswordLogin = 0
         UserInfosListe = []
-        PasswordLogin = ""
         UserInfosListe = input(
             "\nEntrez maintenant votre nom et votre age séparé par un espace afin de vous connecter\n").split(" ")
-        PasswordLogin = input(
-            "Entrez votre mot de passe\nMot de pass oublié ? Tapez 1\n")
 
         if UserInfosListe[0] == "exit" or PasswordLogin == "exit":
             print("Vous avez quitté l'application")
             sleep(1)
             exit()
 
-        if PasswordLogin == "1":
-            # On appelle la fonction reset_mdp
-            reset_mdp(cnx, UserInfosListe)
+        while PasswordLogin == 0:
+            PasswordLogin = input(
+                "Entrez votre mot de passe\nMot de passe oublié ? Tapez 1\n")
+
+            if PasswordLogin == "1":
+                # On appelle la fonction reset_mdp
+                reset_mdp(cnx, UserInfosListe)
+                return login(cnx, Authorized)
 
         if len(UserInfosListe) != 2:
             # On recommence la boucle si l'utilisateur n'a pas rentré le bon nombre d'arguments
@@ -81,7 +88,7 @@ def login(cnx, Authorized):
         if test == []:
             print("Mauvais nom ou mauvais age. Veuillez réessayer")
             Authorized = False
-            return login(cnx, Authorized)
+            login(cnx, Authorized)
 
         myCursor = cnx.cursor(prepared=True)
         queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
@@ -274,7 +281,7 @@ def staffRegister(cnx, myCursor):
     while chefStaff not in ("O", "N"):
         chefStaff = input("Etes-vous chef ? (O/N) ")
         if chefStaff == "O":
-            queryChef = "UPDATE STAFF SET Prix_chef = '300.00' WHERE Id_staff = %s"
+            queryChef = "UPDATE STAFF SET Prix_chef = 1000 WHERE Id_staff = %s"
             myCursor.execute(queryChef, (myCursor.lastrowid,))
             cnx.commit()
 
@@ -324,11 +331,10 @@ def reset_mdp(cnx, UserInfosListe):
         if newPassword != newPasswordVerif:
             print("Les mots de passe ne correspondent pas !")
 
-    newPassword = hash_password(newPassword)
+    HashedPassword = hash_password(newPassword)
     myCursor = cnx.cursor(prepared=True)
     query = "UPDATE PERSONNE SET Mot_de_passe = %s WHERE Nom = %s AND Age = %s"
     myCursor.execute(
-        query, (newPassword, UserInfosListe[0], UserInfosListe[1]))
+        query, (HashedPassword, UserInfosListe[0], UserInfosListe[1]))
     cnx.commit()
     print("Votre mot de passe a bien été changé !")
-    return login(cnx, Authorized=False)

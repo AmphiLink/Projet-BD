@@ -489,9 +489,101 @@ create unique index FKde_IND
 create unique index ID_TYPE_ACTI_IND
      on TYPE_ACTI (Id_type_acti);
 
---- Dump Section
+-- Dump Section
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Doe', 25, '$2b$12$57ToY5hwTRn.nbMcQ95XQuRG0UsbL4va2rb5.xFYU.lR4HNpH.rnW');
+INSERT INTO Prenom (Prenom, Id_Pers) VALUES ('John', 1);
+INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (1, 'France', 75000, 'Paris', 1, 'John.Doe@gmail.com', 0600000000);
 
---- Views Section
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Johnson', 20);
+INSERT INTO Prenom (Prenom, Id_Pers) VALUES ('Jack', 2);
+INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (2, 'France', 75000, 'Paris', 2, 'Jack.Johnson@gmail.com', 0600000001);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Daniel', 6);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('David', 3);
+INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (3, 'France', 75000, 'Paris', 3, 'boutchou@gmail.com', 0600000002);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Merton', 30);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Angela', 4);
+INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (4, 'France', 75000, 'Paris', 4, 'angela.merton@gmail.com', 0600000003);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Bouffioux', 19);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Corentin', 5);
+INSERT INTO STAFF (Id_Pers, Prix) VALUES (5, 1700);
+INSERT INTO ANIMATEUR (Id_staff) VALUES (1);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Elice', 19);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Simon', 6);
+INSERT INTO STAFF (Id_Pers, Prix) VALUES (6, 2200);
+INSERT INTO CUISINIER (Id_staff) VALUES (2);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('VV', 19);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Alexis', 7);
+INSERT INTO STAFF (Id_Pers, Prix) VALUES (7, 1700);
+INSERT INTO ADMINISTRATION (Id_staff) VALUES (3);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Morg', 26);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Morgan', 8);
+INSERT INTO STAFF (Id_Pers, Prix) VALUES (8, 2000);
+INSERT INTO TECHNICIEN (Id_staff) VALUES (4);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Bernagou', 19);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Esteban', 9);
+INSERT INTO STAFF (Id_Pers, Prix ,Prix_chef) VALUES (9, 1700, 1000);
+INSERT INTO ANIMATEUR (Id_staff) VALUES (5);
+
+INSERT INTO PERSONNE (Nom, Age) VALUES ('Leco', 27);
+INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Clement', 10);
+INSERT INTO STAFF (Id_Pers, Prix) VALUES (10, 1700);
+INSERT INTO ANIMATEUR (Id_staff) VALUES (6);
+
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (10, 0, 5, 'Basketball');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (15, 0, 3, 'Football');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (10, 130, 8, 'Volleyball');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (40, 0, 18, 'Spa');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (40, 140, 15, 'Ski-Nautique');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (10, 0, 4, 'Badminton');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (20, 130, 10, 'Escalade');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (10, 0, 3, 'Mini-Golf');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (15, 0, 3, 'Club enfant');
+INSERT INTO TYPE_ACTI (Prix, Taille_min_, Age_min, Nom) VALUES (70, 150, 15, 'Plongée');
+
+INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti) VALUES ('2023-07-01', '10:00', 'Terrain de basket', 1);
+INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti) VALUES ('2023-07-01', '14:00', 'Terrain de football', 2);
+INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti) VALUES ('2023-07-02', '16:00', 'Terrain de volleyball', 3);
+
+INSERT INTO TOURNOI (Date_tournoi, Heure, Lieu, Id_acti, Prix) VALUES ('2023-07-01', '10:00', 'Terrain de basket', 1, 10);
+INSERT INTO TOURNOI (Date_tournoi, Heure, Lieu, Id_acti, Prix) VALUES ('2023-07-01', '14:00', 'Terrain de volleyball', 3, 10);
+
+INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-05-11', 10000);
+INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-06-12', 8000);
+INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-06-13', 11000);
+INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2024-07-13', 11000);
+
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Ballon de foot', 'Sport', 8, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Raquette de bad', 'Sport', 15, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Baudrier', 'Sport', 20, 'Bon');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Volant', 'Sport', 5, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Cubs de golf', 'Sport', 15, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Balles de golf', 'Sport', 5, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Masque et tuba', 'Sport', 20, 'Très bon');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Raclettes', 'Entretien', 10, 'Mitigé');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Boite à outils', 'Entretien', 15, 'Très bon');
+INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Kit survie', 'Santé', 30, 'Neuve');
+
+INSERT INTO SECTEUR (Nom) VALUES ('Lac');
+INSERT INTO SECTEUR (Nom) VALUES ('Plaine de jeu');
+INSERT INTO SECTEUR (Nom) VALUES ('Piscine');
+INSERT INTO SECTEUR (Nom) VALUES ('Douches publiques');
+INSERT INTO SECTEUR (Nom) VALUES ('Spa');
+INSERT INTO SECTEUR (Nom) VALUES ('Salle de sport');
+
+INSERT INTO EMPLACEMENT(Type_emplacement, Occupation, Prix, bbq, nbr_places, acces_eau, Cuisinier) VALUES ('Tente', 0, 20, 1, 4, 1, 0);
+INSERT INTO EMPLACEMENT(Type_emplacement, Occupation, Prix, bbq, nbr_places, acces_eau, Cuisinier) VALUES ('Caravane', 0, 30, 0, 4, 1, 0);
+INSERT INTO EMPLACEMENT(Type_emplacement, Occupation, Prix, bbq, nbr_places, acces_eau, Cuisinier) VALUES ('Mobil-home', 0, 70, 1, 4, 1, 0);
+
+
+
+-- Views Section
 
 create VIEW view_Client AS
 select C.Id_cli as "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom as "Nom de l'équipe", Id_Tournoi, Id_emplacement 
@@ -506,7 +598,7 @@ and E.Id_equipe = P.Id_equipe;
 
 create VIEW view_Animateur_PossibleActivite AS
 select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", PF.Id_type_acti as "Type de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
-from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA
+from STAFF S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA
 where PS.Id_Pers = P.Id_Pers
 and PS.Id_Pers = S.Id_Pers
 and S.Id_staff = A.Id_anim
@@ -605,4 +697,3 @@ from Staff
 where Prix_chef = null
 and Employe_ != null;
 
-INSERT INTO client VALUES ('valeur 1', 'valeur 2', ...)
