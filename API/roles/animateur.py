@@ -31,6 +31,7 @@ def main_animateur(cnx, Id_Pers):
 
     if choix == "liste_activités" or choix == "1":
         liste_activités(cnx, Id_Pers)
+        main_animateur(cnx, Id_Pers)
     elif choix == "rajouter une compétence" or choix == "2":
         os.system("cls")
         NewJob = ""
@@ -49,8 +50,7 @@ def main_animateur(cnx, Id_Pers):
         myCursor.execute(queryAdd, (Id_anim, NewJob))
         cnx.commit()
         print("Compétence ajoutée !")
-        sleep(1)
-        os.system("cls")
+        main_animateur(cnx, Id_Pers)
 
     elif choix == "rajouter une animation" or choix == "3":
         myCursor = cnx.cursor(prepared=True)
@@ -71,6 +71,7 @@ def main_animateur(cnx, Id_Pers):
         queryAddActi = "INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti, Id_anim) VALUES (%s, %s, %s, %s, %s)"
         myCursor.execute(queryAddActi, (Date_acti, Heure,
                          Lieu, Id_type_acti, Id_anim))
+        main_animateur(cnx, Id_Pers)
 
     elif choix == "gérer une animation " or choix == "4":
         myCursor = cnx.cursor(prepared=True)
@@ -96,9 +97,54 @@ def main_animateur(cnx, Id_Pers):
         queryUpdate = "UPDATE ACTIVITE SET Id_anim = %s WHERE Id_acti = %s"
         myCursor.execute(queryUpdate, (Id_anim, ActiGestion))
         cnx.commit()
+        main_animateur(cnx, Id_Pers)
 
     elif choix == "profil" or choix == "5":
-        return 0
+        myCursor = cnx.cursor(prepared=True)
+        print("Voici votre profil : \n========================\n")
+        print("Données personnelles : \n=========================")
+        prenomsListe = []
+        queryPrenoms = "SELECT Prenom FROM Prenom WHERE Id_Pers = %s"
+        myCursor.execute(queryPrenoms, (Id_Pers,))
+        for prenoms in myCursor:
+            prenomsListe.append(prenoms[0])
+        myCursor.fetchall()
+
+        queryInfos = "SELECT Id_staff, Nom, Age, Salaire, Date_acti, Heure, Lieu, Id_type_acti, Activite, Prix_acti, Taille_min_, Age_min FROM view_Animateur_Activite WHERE Id_staff = %s"
+        myCursor.execute(queryInfos, (Id_staff,))
+
+        verif = 0
+        for Id_staff, Nom, Age, Salaire, Date, Heure, Lieu, Id_type_acti, NomActi, Prix, Taille_min_, Age_min in myCursor:
+            if verif == 0:
+                print("Id : %s\nNom : %s" % (Id_staff, Nom))
+                # On affiche les prénoms stockés dans la liste prenomsListe en ligne
+                print("Prénom(s) : %s" % (", ".join(prenomsListe)))
+                print("Age : %s\nSalaire : %s \u20ac" % (Age, Salaire))
+                print("\nVos activités : \n=========================")
+            if verif == 1:
+                print("\n=========================")
+            if Date == None:
+                print("Vous n'avez pas d'activité prévue")
+            else:
+                print("Date : %s\nHeure : %s\nLieu : %s\nActivité : %s\nPrix : %s \u20ac\nTaille minimum : %s cm\nAge minimum : %s ans\n" % (
+                    Date, Heure, Lieu, NomActi, Prix, Taille_min_, Age_min))
+
+            verif = 1
+
+        myCursor.fetchall()
+        queryCompetences = "SELECT Id_type_acti, Activite, Prix_acti, Taille_min_, Age_min FROM view_Animateur_PossibleActivite WHERE Id_staff = %s"
+        myCursor.execute(queryCompetences, (Id_staff,))
+        print("\nActivités que vous pouvez animer : \n=========================")
+        for Id_type_acti, Activite, Prix_acti, Taille_min_, Age_min in myCursor:
+            if Id_type_acti == None:
+                print("Vous n'avez pas de compétences")
+            else:
+                print("Activité : %s\nPrix : %s \u20ac\nTaille minimum : %s cm\nAge minimum : %s ans\n" % (
+                    Activite, Prix_acti, Taille_min_, Age_min))
+        a = input("\nAppuyez sur une enter pour continuer")
+        if a == "":
+            os.system("cls")
+            main_animateur(cnx, Id_Pers)
 
     else:
         print("Vous avez quitté l'application")
@@ -123,5 +169,3 @@ def liste_activités(cnx, Id_Pers):
               (Id_type_acti, Nom, Prix, Taille_min_, Age_min))
     myCursor.fetchall()
     sleep(4)
-    os.system("cls")
-    main_animateur(cnx, Id_Pers)

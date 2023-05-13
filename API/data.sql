@@ -81,6 +81,7 @@ create table EQUIPE (
      Id_equipe int not null AUTO_INCREMENT,
      Nom varchar(250) not null,
      Nbr_pers int not null,
+     Nbr_PersMax int not null,
      constraint ID_EQUIPE_ID primary key (Id_equipe));
 
 create table FICHE_COMPTA (
@@ -145,8 +146,7 @@ create table peut_faire (
 
 create table Prenom (
      Id_Pers int not null,
-     Prenom varchar(250) null not null,
-     constraint ID_Prenom_ID primary key (Id_Pers));
+     Prenom varchar(250) not null);
 
 create table SECTEUR (
      Id_secteur int not null AUTO_INCREMENT,
@@ -586,7 +586,7 @@ INSERT INTO EMPLACEMENT(Type_emplacement, Occupation, Prix, bbq, nbr_places, acc
 -- Views Section
 
 create VIEW view_Client AS
-SELECT C.Id_cli AS "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom AS "Nom de l'équipe", P.Id_tournoi, Id_emplacement, PS.Nom, PS.age
+SELECT C.Id_cli, Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom AS "Equipe", E.Nbr_pers, E.Nbr_PersMax, P.Id_tournoi, Id_emplacement, PS.Nom, PS.age, Con_Email, Con_Telephone, LM.Id_mat, Date_loc
 FROM CLIENT C
 JOIN PERSONNE PS ON C.Id_Pers = PS.Id_Pers
 LEFT JOIN inscription I ON C.Id_cli = I.Id_cli
@@ -594,10 +594,12 @@ LEFT JOIN ACTIVITE A ON I.Id_acti = A.Id_acti
 LEFT JOIN EQUIPE E ON C.Id_equipe = E.Id_equipe
 LEFT JOIN participe P ON E.Id_equipe = P.Id_equipe
 LEFT JOIN TOURNOI T ON P.Id_tournoi = T.Id_tournoi
-LEFT JOIN loue_emplacement L ON C.Id_cli = L.Id_cli;
+LEFT JOIN loue_emplacement L ON C.Id_cli = L.Id_cli
+LEFT JOIN Loue_mat LM ON C.Id_cli = LM.Id_cli
+LEFT JOIN MATERIEL M ON LM.Id_mat = M.Id_mat;
 
 create VIEW view_Animateur_PossibleActivite AS
-select S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix as "Salaire", PF.Id_type_acti as "N° de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
+select S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix, PF.Id_type_acti, TA.Nom as "Activite", TA.Prix as "Prix_acti", Taille_min_, Age_min
 from STAFF S
 JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
 JOIN ANIMATEUR A ON A.Id_staff = S.Id_staff
@@ -605,9 +607,9 @@ LEFT JOIN peut_faire PF ON A.Id_anim = PF.Id_anim
 LEFT JOIN TYPE_ACTI TA ON PF.Id_type_acti = TA.Id_type_acti;
 
 create VIEW view_Animateur_Activite AS
-SELECT S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix AS "Salaire", Date_acti AS "Date", Heure, Lieu,
-       ACT.Id_type_acti, TA.Nom AS "Nom de l'activité", TA.Prix AS "Prix de l'activité",
-       Taille_min_ AS "Taille minimum", Age_min AS "Age minimum"
+SELECT S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix AS "Salaire", Date_acti, Heure, Lieu,
+       ACT.Id_type_acti, TA.Nom AS "Activite", TA.Prix AS "Prix_acti",
+       Taille_min_, Age_min
 FROM STAFF S
 JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
 JOIN ANIMATEUR A ON A.Id_staff = S.Id_staff
@@ -616,7 +618,7 @@ LEFT JOIN TYPE_ACTI TA ON TA.Id_type_acti = ACT.Id_type_acti;
 
 
 create VIEW view_Employe_Technicien AS
-select S.Id_staff, PS.Nom as "Nom", Age, S.Id_Pers, Prix as "Salaire", T.Id_tech, Date_net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
+select S.Id_staff, PS.Nom, Age, S.Id_Pers, Prix as "Salaire", T.Id_tech, Date_net, Heure, N.Id_secteur, SC.Nom as "Nom_secteur"
 from STAFF S 
 JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
 JOIN TECHNICIEN T ON T.Id_staff = S.Id_staff
@@ -638,7 +640,7 @@ JOIN CUISINIER C ON C.Id_staff = S.Id_staff
 LEFT JOIN cuisine CU ON C.Id_cuis = CU.Id_cuis;
 
 create VIEW view_Administration AS
-select S.Id_staff, PS.Nom, Age, S.Id_pers, S.Prix as "Salaire", AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
+select S.Id_staff, PS.Nom, Age, S.Id_pers, S.Prix as "Salaire", AD.ID_admin, Id_mat, M.Nom as "Materiel",Type_mat, M.Prix as "Prix_mat", Etat, Id_fiche_Compta, Date_fiche, Prix_total
 from STAFF S 
 JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
 JOIN ADMINISTRATION AD ON AD.Id_staff = S.Id_staff
@@ -646,14 +648,14 @@ LEFT JOIN MATERIEL M ON AD.Id_admin = M.Id_admin
 LEFT JOIN FICHE_COMPTA FC ON AD.Id_admin = FC.Id_admin;
 
 create VIEW view_Comptabilite_EMPLACEMENT AS
-SELECT Date_debut, LE.Id_emplacement, Prix, C.Id_cli AS "Id Client", Nom
+SELECT Date_debut, LE.Id_emplacement, Prix, C.Id_cli, Nom
 FROM CLIENT C
 JOIN PERSONNE P ON C.Id_Pers = P.Id_pers
 LEFT JOIN loue_emplacement LE ON LE.Id_cli = C.Id_cli
 LEFT JOIN EMPLACEMENT E ON LE.Id_emplacement = E.Id_emplacement;
 
 create VIEW view_Comptabilite_MATERIEL AS
-select Date_loc as "Date de location", LM.Id_mat, M.Prix, C.Id_cli as "Id Client", P.Nom
+select Date_loc, LM.Id_mat, M.Prix, C.Id_cli, P.Nom
 from CLIENT C
 JOIN PERSONNE P ON C.Id_Pers = P.Id_pers
 LEFT JOIN Loue_mat LM ON LM.Id_cli = C.Id_cli
