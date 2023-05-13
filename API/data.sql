@@ -131,9 +131,9 @@ create table participe (
 
 create table PERSONNE (
      Nom varchar(250),
-     Age int,
+     Age int not null,
      Id_Pers int not null AUTO_INCREMENT,
-     Mot_de_passe varchar(250),
+     Mot_de_passe varchar(250) not null,
      STAFF int,
      CLIENT int,
      constraint ID_PERSONNE_ID primary key (Id_Pers));
@@ -145,7 +145,7 @@ create table peut_faire (
 
 create table Prenom (
      Id_Pers int not null,
-     Prenom varchar(250) null,
+     Prenom varchar(250) null not null,
      constraint ID_Prenom_ID primary key (Id_Pers));
 
 create table SECTEUR (
@@ -494,44 +494,44 @@ INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Doe', 25, '$2b$12$57ToY5h
 INSERT INTO Prenom (Prenom, Id_Pers) VALUES ('John', 1);
 INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (1, 'France', 75000, 'Paris', 1, 'John.Doe@gmail.com', 0600000000);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Johnson', 20);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Johnson', 20, '$2b$12$Ki8MD5hrvVyZi601OrM5ROuSl0d7WfmsHA4Cv8UycvA.XWZylllb.');
 INSERT INTO Prenom (Prenom, Id_Pers) VALUES ('Jack', 2);
 INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (2, 'France', 75000, 'Paris', 2, 'Jack.Johnson@gmail.com', 0600000001);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Daniel', 6);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Daniel', 6, '$2b$12$FS4buiVtAPmHbMUdu1fNBOQRWKiush7NBUp3dhf0oUOVRWXYxGcjK');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('David', 3);
 INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (3, 'France', 75000, 'Paris', 3, 'boutchou@gmail.com', 0600000002);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Merton', 30);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Merton', 30, '$2b$12$qVlioM4Yc.UMuDIRuR/Up.tRFQVfAb4oBVjwN9LFhCHQ6/EVO5IKi');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Angela', 4);
 INSERT INTO CLIENT (Id_Pers, Pays, Code_postal, Ville, Numero_de_maison, Con_Email, Con_Telephone) VALUES (4, 'France', 75000, 'Paris', 4, 'angela.merton@gmail.com', 0600000003);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Bouffioux', 19);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Bouffioux', 19, '$2b$12$xTLAckXQcNvVnNuM3B1TSurI5e8nNfgWr9G4gu.P7Oag6mtt9LGVK');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Corentin', 5);
 INSERT INTO STAFF (Id_Pers, Prix) VALUES (5, 1700);
 INSERT INTO ANIMATEUR (Id_staff) VALUES (1);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Elice', 19);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Elice', 19, '$2b$12$X5JRqLcjlN5xXaW04OB61.c.LcpN.NWhWqQao0peSBsDJn2P.VJmC');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Simon', 6);
 INSERT INTO STAFF (Id_Pers, Prix) VALUES (6, 2200);
 INSERT INTO CUISINIER (Id_staff) VALUES (2);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('VV', 19);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('VV', 19, '$2b$12$t6YGDhFi/3LNfUH973DX5OKQhR/QB2YM6Is2Uc3TIzzdhElqCnL5u');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Alexis', 7);
 INSERT INTO STAFF (Id_Pers, Prix) VALUES (7, 1700);
 INSERT INTO ADMINISTRATION (Id_staff) VALUES (3);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Morg', 26);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Morg', 26, '$2b$12$Zqdaf/C3F3o6/1QEJ2pnA.CLghaj2td6vMvMwGvQ1LPzY.UliO2eS');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Morgan', 8);
 INSERT INTO STAFF (Id_Pers, Prix) VALUES (8, 2000);
 INSERT INTO TECHNICIEN (Id_staff) VALUES (4);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Bernagou', 19);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Bernagou', 19, '$2b$12$fQN.wGB5NdJm5tK782YNZeh4G1nHdXm0yqdKRHre0C5XTSHTtLYye');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Esteban', 9);
 INSERT INTO STAFF (Id_Pers, Prix ,Prix_chef) VALUES (9, 1700, 1000);
 INSERT INTO ANIMATEUR (Id_staff) VALUES (5);
 
-INSERT INTO PERSONNE (Nom, Age) VALUES ('Leco', 27);
+INSERT INTO PERSONNE (Nom, Age, Mot_de_passe) VALUES ('Leco', 27, '$2b$12$SAQfBRo8tMIAweh/twFzNONf0hmZN4pWF4qBl5Th/qk2IYg87ucyG');
 INSERT INTO Prenom (Prenom, Id_pers) VALUES ('Clement', 10);
 INSERT INTO STAFF (Id_Pers, Prix) VALUES (10, 1700);
 INSERT INTO ANIMATEUR (Id_staff) VALUES (6);
@@ -586,114 +586,172 @@ INSERT INTO EMPLACEMENT(Type_emplacement, Occupation, Prix, bbq, nbr_places, acc
 -- Views Section
 
 create VIEW view_Client AS
-select C.Id_cli as "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom as "Nom de l'équipe", Id_Tournoi, Id_emplacement 
-from CLIENT C, inscription I, ACTIVITE A, loue_emplacement L, EQUIPE E, participe P
-where C.Id_cli = I.Id_cli
-and I.Id_acti = A.Id_acti
-and C.Id_cli = L.Id_cli
-and C.Id_equipe = E.Id_equipe
-and E.Id_equipe = P.Id_equipe;
-
-
+SELECT C.Id_cli AS "Id du client", Pays, Code_postal, Ville, Numero_de_maison, I.Id_acti, E.Id_equipe, E.Nom AS "Nom de l'équipe", P.Id_tournoi, Id_emplacement, PS.Nom, PS.age
+FROM CLIENT C
+JOIN PERSONNE PS ON C.Id_Pers = PS.Id_Pers
+LEFT JOIN inscription I ON C.Id_cli = I.Id_cli
+LEFT JOIN ACTIVITE A ON I.Id_acti = A.Id_acti
+LEFT JOIN EQUIPE E ON C.Id_equipe = E.Id_equipe
+LEFT JOIN participe P ON E.Id_equipe = P.Id_equipe
+LEFT JOIN TOURNOI T ON P.Id_tournoi = T.Id_tournoi
+LEFT JOIN loue_emplacement L ON C.Id_cli = L.Id_cli;
 
 create VIEW view_Animateur_PossibleActivite AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", PF.Id_type_acti as "Type de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
-from STAFF S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and S.Id_staff = A.Id_anim
-and A.Id_anim = PF.Id_anim
-and TA.Id_type_acti = PF.Id_type_acti
-and Prix_chef = null
-and ANIMATEUR != null
-group by S.Id_staff;
+select S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix as "Salaire", PF.Id_type_acti as "N° de l'activité", TA.Nom as "Nom de l'activité", TA.Prix, Taille_min_, Age_min
+from STAFF S
+JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
+JOIN ANIMATEUR A ON A.Id_staff = S.Id_staff
+LEFT JOIN peut_faire PF ON A.Id_anim = PF.Id_anim
+LEFT JOIN TYPE_ACTI TA ON PF.Id_type_acti = TA.Id_type_acti;
 
 create VIEW view_Animateur_Activite AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Date_Acti as "Date", Heure, Lieu, PF.Id_type_acti, TA.Nom as "Nom de l'activité", TA.Prix "Prix de l'activité", Taille_min_ "Taille minimum", Age_min as "Age minimum"
-from Staff S, Prenom P, PERSONNE PS, ANIMATEUR A, peut_faire PF, TYPE_ACTI TA, ACTIVITE ACT
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and S.Id_staff = A.Id_anim
-and A.Id_anim = PF.Id_anim
-and ACT.Id_anim = A.Id_anim
-and TA.Id_type_acti = ACT.Id_type_acti
-and Prix_chef = null
-and ANIMATEUR != null
-group by S.Id_staff;
+SELECT S.Id_staff, PS.Nom, Age, S.Id_Pers, S.Prix AS "Salaire", Date_acti AS "Date", Heure, Lieu,
+       ACT.Id_type_acti, TA.Nom AS "Nom de l'activité", TA.Prix AS "Prix de l'activité",
+       Taille_min_ AS "Taille minimum", Age_min AS "Age minimum"
+FROM STAFF S
+JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
+JOIN ANIMATEUR A ON A.Id_staff = S.Id_staff
+LEFT JOIN ACTIVITE ACT ON ACT.Id_anim = A.Id_anim
+LEFT JOIN TYPE_ACTI TA ON TA.Id_type_acti = ACT.Id_type_acti;
 
-create VIEW view_Employé_Technicien AS
-select S.Id_staff, PS.Nom as "Nom", Prenom, Age, S.Id_pers, Prix as "Salaire", T.Id_tech, Date_Net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
-from Staff S, Prenom P, PERSONNE PS, TECHNICIEN T, NETTOIE N, SECTEUR SC
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and S.Id_staff = T.Id_staff
-and T.Id_tech = N.Id_tech
-and N.Id_secteur = SC.Id_secteur  
-and Prix_chef = null
-and TECHNICIEN != null;
+
+create VIEW view_Employe_Technicien AS
+select S.Id_staff, PS.Nom as "Nom", Age, S.Id_Pers, Prix as "Salaire", T.Id_tech, Date_net, Heure, N.Id_secteur, SC.Nom as "Nom du Secteur"
+from STAFF S 
+JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
+JOIN TECHNICIEN T ON T.Id_staff = S.Id_staff
+LEFT JOIN NETTOIE N ON T.Id_tech = N.Id_tech
+LEFT JOIN SECTEUR SC ON N.Id_secteur = SC.Id_secteur;
+
 
 create VIEW view_Chef AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire"
-from Staff S, Prenom P, PERSONNE PS
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and Prix_chef != null
-and CUISINIER != null
-or TECHNICIEN != null
-or ANIMATEUR != null;
+select S.Id_staff, Nom, Age, S.Id_Pers, Prix as "Salaire", Prix_chef as "Bonus"
+from STAFF S, PERSONNE PS
+where PS.Id_Pers = S.Id_Pers
+and Prix_chef is not null;
 
 create VIEW view_Cuisinier AS
-select S.Id_staff, Nom, Prenom, Age, S.Id_pers, Prix as "Salaire", Id_cuisine,  Id_emplacement, Id_tournoi
-from Staff S, Prenom P, PERSONNE PS, CUISINIER C , cuisine CU
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and S.Id_staff = C.Id_staff
-and CU.Id_cuis = C.Id_cuis
-and Prix_chef = null
-and CUISINIER != null;
+select S.Id_staff, Nom, Age, S.Id_pers, Prix as "Salaire", Id_cuisine, Id_emplacement, Id_tournoi
+from STAFF S
+JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
+JOIN CUISINIER C ON C.Id_staff = S.Id_staff
+LEFT JOIN cuisine CU ON C.Id_cuis = CU.Id_cuis;
 
 create VIEW view_Administration AS
-select S.Id_staff, PS.Nom, Prenom, Age, S.Id_pers, S.Prix as "Salaire", Mot_de_passe, AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_Mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_Fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
-from Staff S, Prenom P, PERSONNE PS, ADMINISTRATION AD, MATERIEL M, FICHE_COMPTA FC
-where PS.Id_Pers = P.Id_Pers
-and PS.Id_Pers = S.Id_Pers
-and AD.Id_admin = FC.Id_admin
-and AD.Id_admin = M.Id_admin
-and ADMINISTRATION != null;
+select S.Id_staff, PS.Nom, Age, S.Id_pers, S.Prix as "Salaire", AD.ID_admin, Id_mat, M.Nom as "Nom du matériel",Type_mat as "Type du matériel", M.Prix as "Prix du matériel", Etat, Id_fiche_Compta, Date_fiche as "date de la fiche", Prix_total as "Prix total de la fiche"
+from STAFF S 
+JOIN PERSONNE PS ON PS.Id_Pers = S.Id_Pers
+JOIN ADMINISTRATION AD ON AD.Id_staff = S.Id_staff
+LEFT JOIN MATERIEL M ON AD.Id_admin = M.Id_admin
+LEFT JOIN FICHE_COMPTA FC ON AD.Id_admin = FC.Id_admin;
 
-create VIEW view_Comptabilité_EMPLACEMENT AS
-select Date_debut, LE.Id_emplacement, Prix, C.Id_cli as "Id Client", Nom, Prenom 
-from loue_emplacement LE, EMPLACEMENT E, CLIENT C, PERSONNE P, PRENOM PR
-where LE.id_emplacement = E.Id_emplacement
-and LE.Id_cli = C.Id_cli
-and C.Id_Pers = P.Id_pers
-and PR.Id_Pers = P.Id_pers;
+create VIEW view_Comptabilite_EMPLACEMENT AS
+SELECT Date_debut, LE.Id_emplacement, Prix, C.Id_cli AS "Id Client", Nom
+FROM CLIENT C
+JOIN PERSONNE P ON C.Id_Pers = P.Id_pers
+LEFT JOIN loue_emplacement LE ON LE.Id_cli = C.Id_cli
+LEFT JOIN EMPLACEMENT E ON LE.Id_emplacement = E.Id_emplacement;
 
-create VIEW view_Comptabilité_MATERIEL AS
-select Date_loc as "Date de location", LM.Id_mat, Prix, C.Id_cli as "Id Client", P.Nom, Prenom 
-from Loue_mat LM, MATERIEL M, CLIENT C, PERSONNE P, PRENOM PR
-where M.Id_mat = LM.Id_mat
-and LM.Id_cli = C.Id_cli
-and C.Id_Pers = P.Id_pers
-and PR.Id_Pers = P.Id_pers;
+create VIEW view_Comptabilite_MATERIEL AS
+select Date_loc as "Date de location", LM.Id_mat, M.Prix, C.Id_cli as "Id Client", P.Nom
+from CLIENT C
+JOIN PERSONNE P ON C.Id_Pers = P.Id_pers
+LEFT JOIN Loue_mat LM ON LM.Id_cli = C.Id_cli
+LEFT JOIN MATERIEL M ON LM.Id_mat = M.Id_mat;
 
-create VIEW view_Comptabilité_Emplacement AS
-select Date_debut, LE.Id_emplacement, Prix, C.Id_cli as "Id Client", Nom, Prenom 
-from loue_emplacement LE, EMPLACEMENT E, CLIENT C, PERSONNE P, PRENOM PR
-where LE.id_emplacement = E.Id_emplacement
-and LE.Id_cli = C.Id_cli
-and C.Id_Pers = P.Id_pers
-and PR.Id_Pers = P.Id_pers;
+create VIEW view_Comptabilite_STAFFChef AS
+select Id_staff, Prix as "Salaire", Prix_chef as "Bonus"
+from STAFF
+where Prix_chef is not null;
 
-create VIEW view_Comptabilité_STAFFChef AS
+create VIEW view_Comptabilite_STAFFEmploye AS
 select Id_staff, Prix as "Salaire"
-from Staff
-where Prix_chef != null
-and Employe_ = null;
+from STAFF
+where Prix_chef is null;
 
-create VIEW view_Comptabilité_STAFFEmploye AS
-select Id_staff, Prix as "Salaire"
-from Staff
-where Prix_chef = null
-and Employe_ != null;
+-- Trigger Section
+
+CREATE TRIGGER COMP_ACTI_ANIM
+BEFORE INSERT ON ACTIVITE
+FOR EACH ROW
+BEGIN
+    -- Déclaration de la variable
+    DECLARE N INTEGER;
+    
+    -- Calcul du nombre de moniteurs compétents pour la nouvelle activité
+    SELECT COUNT(*) INTO N
+    FROM peut_faire P
+    WHERE P.id_type_acti = NEW.id_type_acti
+    AND P.id_anim IN (
+        SELECT id_anim
+        FROM ANIMATEUR
+    );
+
+    -- Vérification si au moins un moniteur est compétent
+    IF N = 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Le moniteur n''a pas les compétences requises.';
+    END IF;
+END;
+
+
+
+
+create trigger AGE_MIN
+before insert on inscription
+for each row
+--declare 
+--when
+begin 
+    if(
+        (--age personnne
+        select Age
+        from PERSONNE P, CLIENT C, inscription I
+        where new.I.id_cli = C.id_cli
+        and C.id_pers = P.id_pers 
+        ) <
+        (--age min
+        select Age_min
+        from TYPE_ACTI T, ACTIVITE A, inscription I 
+        where new.I.id_acti = A.id_acti
+        and A.Id_type_acti = T.Id_type_acti
+        )
+    ) then raise exception "La personne na pas l'âge minimum requis.";
+    end if;
+end;
+
+
+create trigger CHEF_UNIQUE_PAR_SECTION
+before update, insert on STAFF
+for each row
+--declare
+when (new.Prix_chef != null)
+begin
+    if( 
+        ((new.CUISINIER != null) and 
+        (   select * 
+            from STAFF 
+            where Prix_chef != null 
+            and CUISINIER != null)!= null)) then raise exception "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
+    else if(
+        ((new.TECHNICIEN != null) and 
+        (   select * 
+            from STAFF 
+            where Prix_chef != null 
+            and TECHNICIEN != null)!= null)) then raise exception "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
+    else if(
+       ((new.ANIMATEUR != null) and 
+        (   select * 
+            from STAFF 
+            where Prix_chef != null 
+            and ANIMATEUR != null)!= null)) then raise exception "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
+    else if(
+        ((new.ADMINITRATION != null) and 
+        (   select * 
+            from STAFF 
+            where Prix_chef != null 
+            and ADMINITRATION != null)!= null)) then raise exception "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
+    end if;
+end;
+
 

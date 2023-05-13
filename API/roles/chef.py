@@ -30,6 +30,7 @@ def main_chef(user_state, cnx, Id_Pers):
             user_state)
         myCursor.execute(queryList)
         print(myCursor.fetchall())
+        sleep(5)
 
     elif choix == "rajouter_employee":
         nom = input("Nom de l'employé : ")
@@ -252,12 +253,12 @@ def main_chef(user_state, cnx, Id_Pers):
         cnx.commit()
 
         # Partie pour supprimer le.s prénom.s de l'employé
-        queryDeletePrenom = "DELETE FROM Prenom WHERE Id_Pers = %s"
+        queryDeletePrenom = "UPDATE Prenom SET Prenom = 'Anonymized' WHERE Id_Pers = %s"
         myCursor.execute(queryDeletePrenom, (Id_Pers,))
         cnx.commit()
 
         # Suppression dans la table Personne
-        queryDelete = "DELETE FROM PERSONNE WHERE Id_Pers = %s"
+        queryDelete = "UPDATE PERSONNE SET Nom = 'Anonymized', Age = -1, Mot_de_passe = 'Anonymized' WHERE Id_Pers = %s"
         myCursor.execute(queryDelete, (Id_Pers,))
         cnx.commit()
         print("L'employé a bien été supprimé !")

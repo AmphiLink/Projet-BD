@@ -49,6 +49,7 @@ def main_client(cnx, Id_pers):
         sleep(1)
         exit()
 
+
 def reserve_mat(cnx, Id_pers, Id_client):
     """
     Cette fonction permet de réserver du matériel.
@@ -93,6 +94,7 @@ def reserve_mat(cnx, Id_pers, Id_client):
     print("\nVous pouvez aller récupérer votre matériel !")
     sleep(3)
     main_client(cnx, Id_pers)
+
 
 def loue_emplacement(cnx, Id_pers):
     """
@@ -193,6 +195,7 @@ def loue_emplacement(cnx, Id_pers):
     sleep(3)
     main_client(cnx, Id_pers)
 
+
 def rejoindre_equipe(cnx, Id_pers):
     """
     Cette fonction permet de rejoindre une équipe.
@@ -247,6 +250,7 @@ def rejoindre_equipe(cnx, Id_pers):
             sleep(1)
             exit()
 
+
 def inscrire_activite(cnx, Id_pers):
     """
     Cette fonction permet d'inscrire un client à une activité.
@@ -266,7 +270,8 @@ def inscrire_activite(cnx, Id_pers):
         print(" Id:", Id_type_acti, "\n", "Nom:", Nom, "\n")
 
     # Pour obtenir plus d'informations sur une activité
-    type_activity_id = input("Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    type_activity_id = input(
+        "Si vous voulez plus d'informations sur une activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
     # Si le client veut revenir au menu principal
     if type_activity_id == "back":
         main_client(cnx, Id_pers)
@@ -286,7 +291,8 @@ def inscrire_activite(cnx, Id_pers):
             Taille_min_ = resultat[3]
             Age_min = resultat[4]
             os.system("cls")
-            print(" Id:",Id_type_acti,"\n", "Nom:",Nom,"\n", "Prix:",Prix,"\n", "Taille minimum:",Taille_min_,"\n", "Age minimum:",Age_min)        
+            print(" Id:", Id_type_acti, "\n", "Nom:", Nom, "\n", "Prix:", Prix,
+                  "\n", "Taille minimum:", Taille_min_, "\n", "Age minimum:", Age_min)
         # On affiche les informations sur l'activité
         queryInfo = "SELECT Date_acti, Heure, Lieu FROM ACTIVITE WHERE Id_type_acti = %s"
         mycursor.execute(queryInfo, (type_activity_id,))
@@ -295,10 +301,12 @@ def inscrire_activite(cnx, Id_pers):
             Date = resultat[0]
             Heure = resultat[1]
             Lieu = resultat[2]
-            print(" Date:",Date,"\n", "Heure:",Heure, "\n", "Lieu:",Lieu, "\n")
+            print(" Date:", Date, "\n", "Heure:",
+                  Heure, "\n", "Lieu:", Lieu, "\n")
 
     # Si le client veut s'inscrire à une activité
-    activity_id = input("Pour selectionner cette activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+    activity_id = input(
+        "Pour selectionner cette activité, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
     os.system("cls")
     query = "SELECT Id_acti FROM ACTIVITE WHERE Id_type_acti = %s"
     mycursor.execute(query, (activity_id,))
@@ -313,7 +321,7 @@ def inscrire_activite(cnx, Id_pers):
         print("L'Id entré n'est pas valide, veuillez réessayer")
         sleep(2)
         inscrire_activite(cnx, Id_pers)
-    
+
     # On inscrit le client à l'activité
     query = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
     mycursor.execute(query, (Id_pers,))
@@ -322,6 +330,7 @@ def inscrire_activite(cnx, Id_pers):
     mycursor.execute(query, (Id_cli, activity_id))
     cnx.commit()
     print("Vous êtes bien inscrit à l'activité !")
+
 
 def inscrire_tournoi(cnx, Id_pers):
     """
@@ -338,7 +347,7 @@ def inscrire_tournoi(cnx, Id_pers):
         print("Vous n'avez pas d'équipe, veuillez en créer une")
         sleep(2)
         rejoindre_equipe(cnx, Id_pers)
-    else:   
+    else:
         # On récupère les tournois disponibles
         mycursor = cnx.cursor(prepared=True)
         query = "SELECT Id_tournoi, Id_acti FROM TOURNOI"
@@ -356,11 +365,11 @@ def inscrire_tournoi(cnx, Id_pers):
             mycursor.execute(query, (Id_type_acti,))
             Nom = mycursor.fetchall()[0][0]
             print(" Id:", Id_tournoi, "\n", "Nom:", Nom, "\n")
-        
 
         # Pour obtenir plus d'informations sur un tournoi
-        tournoi_id = input("Si vous voulez plus d'informations sur un tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
-                
+        tournoi_id = input(
+            "Si vous voulez plus d'informations sur un tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+
         # On vérifie que l'Id entré est valide
         query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
         mycursor.execute(query, (tournoi_id,))
@@ -369,8 +378,8 @@ def inscrire_tournoi(cnx, Id_pers):
             os.system("cls")
             print("L'Id entré n'est pas valide, veuillez réessayer")
             sleep(2)
-            inscrire_tournoi(cnx, Id_pers)   
-        
+            inscrire_tournoi(cnx, Id_pers)
+
         if tournoi_id == "back":
             main_client(cnx, Id_pers)
         if tournoi_id == "exit":
@@ -394,13 +403,15 @@ def inscrire_tournoi(cnx, Id_pers):
                 Lieu = resultat[4]
                 Prix = resultat[5]
                 os.system("cls")
-            print(" Id:",Id_tournoi,"\n","Nom:",Nom,"\n","Date_tournoi:",Date_tournoi,"\n", "Heure:",Heure,"\n", "Lieu:",Lieu,"\n", "Prix:",Prix)    
+            print(" Id:", Id_tournoi, "\n", "Nom:", Nom, "\n", "Date_tournoi:",
+                  Date_tournoi, "\n", "Heure:", Heure, "\n", "Lieu:", Lieu, "\n", "Prix:", Prix)
 
         # Si le client veut s'inscrire à un tournoi
-        tournoi_id = input("\nPour selectionner ce tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
+        tournoi_id = input(
+            "\nPour selectionner ce tournoi, entrez son Id, sinon entrez 'back' pour revenir au menu principal \n")
         os.system("cls")
         query = "SELECT Id_tournoi FROM TOURNOI WHERE Id_tournoi = %s"
-        mycursor.execute(query,(tournoi_id,))
+        mycursor.execute(query, (tournoi_id,))
         resultats = mycursor.fetchall()
 
         # Si le client veut revenir en arrière
@@ -420,8 +431,8 @@ def inscrire_tournoi(cnx, Id_pers):
             os.system("cls")
             print("L'Id entré n'est pas valide, veuillez réessayer")
             sleep(2)
-            inscrire_tournoi(cnx, Id_pers)  
-        
+            inscrire_tournoi(cnx, Id_pers)
+
         else:
             # On récupère l'Id de l'équipe du client
             query = "SELECT Id_equipe FROM CLIENT WHERE Id_Pers = %s"
@@ -433,12 +444,14 @@ def inscrire_tournoi(cnx, Id_pers):
             mycursor.execute(query, (Id_equipe, tournoi_id))
             cnx.commit()
             print("Vous êtes bien inscrit au tournoi !")
-            
+
+
 def profil(cnx, Id_pers):
     """
     A MODIFIER AVEC LES VUES
     Cette fonction permet d'afficher le profil d'un client.
     """
+    mycursor = cnx.cursor(prepared=True)
     # Si le client veut modifier son profil
     os.system("cls")
     print("Si vous voulez modifier votre profil, entrez 'modif', sinon entrez 'back' pour revenir au menu principal")
@@ -446,10 +459,22 @@ def profil(cnx, Id_pers):
     query = "SELECT ... FROM VIEW .... WHERE Id_Pers = %s"
     mycursor.execute(query, (Id_pers,))
     resultats = mycursor.fetchall()
+
+    # On affiche les informations du client de manière belle
+
+    for resultat in resultats:
+        Id_Cli = resultat[0]
+        Pays = resultat[1]
+        CodePostal = resultat[2]
+        Ville = resultat[3]
+        NumeroDeMaison = resultat[4]
+        Id_equipe = resultat[5]
+        NomEquipe = resultat[6]
+        os.system("cls")
+        print(" Id : ", Id_Cli, "\n", "Pays : ", Pays, "\n", "Code Postal : ",
+              CodePostal, "\n", "Ville : ", Ville, "\n", "N° de maison : ", NumeroDeMaison, "\n", "=======================================\n Partie équipe : \nN° : ", Id_equipe, "\n", "Nom : ", NomEquipe)
     if choix == "modif":
         print("Quel champ voulez-vous modifier ?")
-        for resultat in resultats:
-            print(resultat)
         champ = input()
         print("Quelle valeur voulez-vous mettre ?")
         valeur = input()
