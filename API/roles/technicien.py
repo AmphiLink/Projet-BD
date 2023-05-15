@@ -1,7 +1,8 @@
 import os
 from time import sleep
-
+from datetime import datetime
 from roles.client import profil
+import time
 
 
 def main_technicien(cnx, Id_Pers):
@@ -15,12 +16,12 @@ def main_technicien(cnx, Id_Pers):
     """
     choix = "basic"
     os.system("cls")
-    while choix not in ("Nettoyer un secteur", "exit", "1", "2"):
+    while choix not in ("Nettoyer un secteur", "exit", "1", "2", "3"):
         choix = input(
-            "\nQue voulez vous faire ?\n 1: Nettoyer un secteur\n 2: exit\n ")
+            "\nQue voulez vous faire ?\n1: Nettoyer un secteur\n2: Regarder votre profil\n3: exit\n ")
         os.system("cls")
 
-    if choix == "exit" or choix == "2":
+    if choix == "exit" or choix == "3":
         print("Vous avez quitté l'application !")
         sleep(1)
         exit()
@@ -63,6 +64,70 @@ def main_technicien(cnx, Id_Pers):
         print("\nVous pouvez aller nettoyer ce secteur !")
         sleep(2)
         main_technicien(cnx, Id_Pers)
+
+    else:
+        # On affiche les données personnelles de l'utilisateur
+        myCursor = cnx.cursor(prepared=True)
+        os.system("cls")
+        print("Voici votre profil : \n========================\n")
+        print("Données personnelles : \n=========================")
+        prenomsListe = []
+        queryPrenoms = "SELECT Prenom FROM Prenom WHERE Id_Pers = %s"
+        myCursor.execute(queryPrenoms, (Id_Pers,))
+        for prenoms in myCursor:
+            prenomsListe.append(prenoms[0])
+        myCursor.fetchall()
+
+        queryInfos = "SELECT Id_staff, Nom, Age, Salaire FROM view_Employe_Technicien WHERE Id_staff = %s GROUP BY Id_staff"
+        myCursor.execute(queryInfos, (Id_staff,))
+
+        for (Id_staff, Nom, Age, Salaire) in myCursor:
+            print("Id : %s\nNom : %s" % (Id_staff, Nom))
+            # On affiche les prénoms stockés dans la liste prenomsListe en ligne
+            print("Prénom(s) : %s" % (", ".join(prenomsListe)))
+            print("Age : %s\nSalaire : %s \u20ac\n" % (Age, Salaire))
+        myCursor.fetchall()
+        print("Vos secteurs : \n=========================")
+        # On vérifie si le technicien a des secteurs à nettoyer
+        queryVerif = "SELECT Id_secteur FROM NETTOIE WHERE Id_tech = %s"
+        myCursor.execute(queryVerif, (Id_tech,))
+        verif = myCursor.fetchall()
+
+        if verif == []:
+            print("Vous n'avez pas de secteurs à nettoyer !")
+            a = input("\nAppuyez sur une enter pour continuer")
+            if a == "":
+                sleep(1)
+                os.system("cls")
+                main_technicien(cnx, Id_Pers)
+        # On récupère les secteurs à nettoyer où qui ont été nettoyés
+        querySecteurs = "SELECT Id_secteur, Nom_secteur, Date_net, Heure FROM view_Employe_Technicien WHERE Id_staff = %s GROUP BY Date_net, Heure"
+        myCursor.execute(querySecteurs, (Id_staff,))
+
+        verif = 0
+        madate = datetime.today()
+        MonHeure = datetime.now().time()
+        for (Id_secteur, Nom_secteur, Date_net, Heure) in myCursor:
+            if verif == 1:
+                print("\n=========================")
+            # On vérifie si la date d'aujourd'hui est inférieur à la date de nettoyage
+            Date_net = datetime.strptime(str(Date_net), '%Y-%m-%d')
+            Heure = datetime.strptime(str(Heure), '%H:%M').time()
+            if madate <= Date_net and MonHeure <= Heure:
+                print("Id : %s\nNom : %s" % (Id_secteur, Nom_secteur))
+                print("Date du prochain nettoyage : %s\nHeure du prochain nettoyage : %s\n" % (
+                    Date_net, Heure))
+            else:
+                print("Id : %s\nNom : %s" % (Id_secteur, Nom_secteur))
+                print("Date du dernier nettoyage : %s\nHeure du dernier nettoyage : %s\n" % (
+                    Date_net, Heure))
+            verif = 1
+
+        a = input("\nAppuyez sur une enter pour continuer")
+        if a == "":
+            sleep(1)
+            os.system("cls")
+            main_technicien(cnx, Id_Pers)
 
 
 def list_secteur(cnx):

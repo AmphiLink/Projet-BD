@@ -5,9 +5,9 @@ import os
 
 def main_admin(cnx, Id_Pers):
     choix = "basic"
-    while choix not in ("gérer une fiche compta", "rajouter un matériel", "gérer un matériel", "liste des clients", "supprimer un client", "profil", "regarder la compta de l'année", "Evolution de la compta annuelle", "exit"):
+    while choix not in ("gérer une fiche compta", "rajouter un matériel", "gérer un matériel", "liste des clients", "supprimer un client", "profil", "regarder la compta de l'année", "Evolution de la compta annuelle", "exit", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
         choix = input(
-            "Que voulez vous faire ? (gérer une fiche compta, rajouter un matérie, gérer un matériel, liste des clients, supprimer un client, profil, regarder la compta de l'année, Evolution de la compta annuelle ,exit) \n")
+            "Que voulez vous faire ? \n1.0gérer une fiche compta\n2.Rajouter un matériel\n3.Gérer un matériel\n4.liste des clients\n5.Supprimer un client\n6. Regarder votre profil\n7.Regarder la compta de l'année\n8.Evolution de la compta annuelle\n9.exit) \n")
         sleep(1)
 
     myCursor = cnx.cursor(prepared=True)
@@ -22,12 +22,12 @@ def main_admin(cnx, Id_Pers):
     myCursor.execute(queryIdAdmin, (Id_staff,))
     Id_admin = myCursor.fetchall()[0][0]
 
-    if choix == "exit":
+    if choix == "exit" or choix == "9":
         print("Vous avez quitté l'application !")
         sleep(1)
         exit()
 
-    elif choix == "gérer une fiche compta":
+    elif choix == "gérer une fiche compta" or choix == "1":
         # On sélectionne toutes les fiches compta non-gérées
         queryFicheCompta = ("SELECT * FROM FICHE_COMPTA WHERE Id_admin = NULL")
         myCursor.execute(queryFicheCompta)
@@ -39,6 +39,7 @@ def main_admin(cnx, Id_Pers):
 
         Id_fiche_compta = input(
             "Quelle fiche compta voulez-vous gérer ? (Tapez le numéro de la fiche)\n")
+        Id_fiche_compta = int(Id_fiche_compta)
 
         # On vérifie que le numéro est bon
         queryVerifIdFiche = "SELECT Id_fiche_compta FROM FICHE_COMPTA WHERE Id_fiche_compta = %s"
@@ -55,7 +56,7 @@ def main_admin(cnx, Id_Pers):
         sleep(1)
         os.system("cls")
 
-    elif choix == "rajouter un matériel":
+    elif choix == "rajouter un matériel" or choix == "2":
         myCursor = cnx.cursor(prepared=True)
         Nom = input("Nom du matériel ? \n")
         TypeMateriel = input(
@@ -68,7 +69,7 @@ def main_admin(cnx, Id_Pers):
         myCursor.execute(queryInsertMateriel, (Nom, TypeMateriel, Prix, Etat))
         cnx.commit()
 
-    elif choix == "gérer un matériel":
+    elif choix == "gérer un matériel" or choix == "3":
         myCursor = cnx.cursor(prepared=True)
         # On sélectionne tous les matériels non-gérés
         queryMateriel = ("SELECT * FROM MATERIEL WHERE Id_admin is null")
@@ -81,6 +82,7 @@ def main_admin(cnx, Id_Pers):
 
         Id_mat = input(
             "Quel matériel voulez-vous gérer ? (Tapez le numéro du matériel)\n")
+        Id_mat = int(Id_mat)
 
         # On vérifie que le numéro est bon
         queryVerifIdMateriel = "SELECT Id_mat FROM MATERIEL WHERE Id_mat = %s"
@@ -93,9 +95,9 @@ def main_admin(cnx, Id_Pers):
 
             queryVerifIdMateriel = "SELECT Id_admin FROM MATERIEL WHERE Id_mat = %s"
             myCursor.execute(queryVerifIdMateriel, (Id_mat,))
-            Id_admin = myCursor.fetchall()[0][0]
+            Id_adminVerif = myCursor.fetchall()[0][0]
 
-            if Id_admin != None:
+            if Id_adminVerif != None:
                 print("Ce matériel est déjà géré par un admin !")
             else:
                 # On met à jour l'Id_admin dans la table MATERIEL
@@ -106,7 +108,7 @@ def main_admin(cnx, Id_Pers):
         sleep(1)
         os.system("cls")
 
-    elif choix == "liste des clients":
+    elif choix == "liste des clients" or choix == "4":
         myCursor = cnx.cursor(prepared=True)
         # Pour chaque client, on affiche son nom, prénom, numéro de téléphone son mail, son pays et sa ville
         queryListeClient = "SELECT Id_cli, Nom, Con_Telephone, Con_Email, Pays, Ville FROM view_Client GROUP BY Id_Cli"
@@ -126,7 +128,7 @@ def main_admin(cnx, Id_Pers):
         if skip == "":
             os.system("cls")
 
-    elif choix == "regarder la compta de l'année":
+    elif choix == "regarder la compta de l'année" or choix == "5":
         myCursor = cnx.cursor(prepared=True)
         année = input(
             "De quelle année voulez-vous regarder la compta ? (YYYY)\n")
@@ -144,9 +146,15 @@ def main_admin(cnx, Id_Pers):
         myCursor.execute(queryComptaEmplacement, (année + "%",))
         comptaEmplacement = myCursor.fetchall()[0][0]
 
+        if comptaEmplacement == None:
+            comptaEmplacement = 0
+
         # On récupère les prix des matériels
         myCursor.execute(queryComptaMateriel, (année + "%",))
         comptaMateriel = myCursor.fetchall()[0][0]
+
+        if comptaMateriel == None:
+            comptaMateriel = 0
 
         # On récupère les salaires du staff et des chefs pour chaque mois écoulé de l'année
         année = int(année)
@@ -170,9 +178,8 @@ def main_admin(cnx, Id_Pers):
         # On vérifie si il n'y a pas déjà une fiche de compta pour cette année
         queryCheckFichesCompta = "SELECT SUM(Prix_total) FROM  FICHE_COMPTA WHERE Date_fiche LIKE %s"
         myCursor.execute(queryCheckFichesCompta, (str(année) + "%",))
-        myCursor.fetchall()
-
-        if myCursor != []:
+        Check = myCursor.fetchall()[0][0]
+        if Check != None:
             # Si il en existe déjà une on la met à jour
             queryInsertCompta = "UPDATE FICHE_COMPTA SET Prix_total = %s,  Date_fiche = %s WHERE Date_fiche LIKE %s"
             myCursor.execute(queryInsertCompta, (ComptaTotal,
@@ -190,8 +197,9 @@ def main_admin(cnx, Id_Pers):
         skip = "helo"
         while skip != "":
             skip = input("Appuyez sur enter pour continuer")
+        os.system("cls")
 
-    elif choix == "Evolution de la compta annuelle":
+    elif choix == "Evolution de la compta annuelle" or choix == "6":
         myCursor = cnx.cursor(prepared=True)
 
         année = input(
@@ -269,8 +277,9 @@ def main_admin(cnx, Id_Pers):
         skip = "helo"
         while skip != "":
             skip = input("Appuyez sur enter pour continuer")
+        os.system("cls")
 
-    elif choix == "profil":
+    elif choix == "profil" or choix == "7":
         myCursor = cnx.cursor(prepared=True)
         os.system("cls")
         print("Voici votre profil : \n========================\n")
@@ -403,4 +412,5 @@ def main_admin(cnx, Id_Pers):
         cnx.commit()
 
         print("Le client a bien été supprimé !")
+
     main_admin(cnx, Id_Pers)

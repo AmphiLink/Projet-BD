@@ -18,10 +18,10 @@ def main_chef(user_state, cnx, Id_Pers):
     """
 
     choix = "basic"
-    while choix not in ("liste_employees", "supprimer_employee", "rajouter_employee", "exit", "1", "2", "3", "4"):
+    while choix not in ("liste_employees", "supprimer_employee", "rajouter_employee", "profil", "exit", "1", "2", "3", "4", "5"):
         os.system("cls")
         choix = input(
-            "\nQue voulez vous faire ?\n 1: Liste des employés\n 2: Supprimer un employé\n 3: Rajouter un employé\n 4: exit\n")
+            "\nQue voulez vous faire ?\n1: Liste des employés\n2: Supprimer un employé\n3: Rajouter un employé\n4 : Regarder votre profil\n5: exit\n")
         sleep(1)
 
     myCursor = cnx.cursor(prepared=True)
@@ -31,16 +31,10 @@ def main_chef(user_state, cnx, Id_Pers):
         exit()
 
     if choix == "liste_employees" or choix == "1":
-        # On récupère la liste des employés ayant le même job que le chef
-        queryList = "SELECT P.Nom, Pre.Prenom, P.Age FROM PERSONNE P JOIN Prenom Pre ON P.Id_Pers = Pre.Id_Pers JOIN STAFF S ON P.Id_Pers = S.Id_Pers JOIN {} J ON S.Id_staff = J.Id_staff".format(user_state)
-        myCursor.execute(queryList)
-        result = myCursor.fetchall()
         os.system("cls")
-        print("Voici la liste des employés : ")
-        for i in result:
-            print(str(i).replace("(", "").replace(")", "").replace("'", "").replace(",", " "))
+        print("\nVoici la liste des employés : \n")
+        liste_employes(cnx, user_state, Id_Pers)
         sleep(4)
-        
 
     elif choix == "rajouter_employee" or choix == "3":
         nom = input("Nom de l'employé : ")
@@ -273,6 +267,41 @@ def main_chef(user_state, cnx, Id_Pers):
         cnx.commit()
         print("L'employé a bien été supprimé !")
         main_chef(user_state, cnx, Id_Pers)
+
+    elif choix == "profil" or choix == "4":
+        # On récupère l'Id_staff
+        queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
+        myCursor.execute(queryIdStaff, (Id_Pers,))
+        Id_staff = myCursor.fetchall()[0][0]
+        # On affiche les données personnelles de l'utilisateur
+        myCursor = cnx.cursor(prepared=True)
+        os.system("cls")
+        print("Voici votre profil : \n========================\n")
+        print("Données personnelles : \n=========================")
+        prenomsListe = []
+        queryPrenoms = "SELECT Prenom FROM Prenom WHERE Id_Pers = %s"
+        myCursor.execute(queryPrenoms, (Id_Pers,))
+        for prenoms in myCursor:
+            prenomsListe.append(prenoms[0])
+        myCursor.fetchall()
+
+        queryInfos = "SELECT Id_staff, Nom, Age, Salaire, Bonus FROM view_Chef WHERE Id_staff = %s"
+        myCursor.execute(queryInfos, (Id_staff,))
+
+        for (Id_staff, Nom, Age, Salaire, Bonus) in myCursor:
+            Salaire = Salaire + Bonus
+            print("Id : %s\nNom : %s" % (Id_staff, Nom))
+            # On affiche les prénoms stockés dans la liste prenomsListe en ligne
+            print("Prénom(s) : %s" % (", ".join(prenomsListe)))
+            print("Age : %s\nSalaire : %s \u20ac\n" % (Age, Salaire))
+
+        print("Vos employés : \n=========================")
+        # On affiche les employés du chef
+        liste_employes(user_state, cnx, Id_Pers)
+        a = input("\nAppuyez sur une enter pour continuer")
+        if a == "":
+            a = 1
+
     else:
         print("Vous avez quitté l'application")
         sleep(1)
@@ -280,3 +309,15 @@ def main_chef(user_state, cnx, Id_Pers):
 
     os.system("cls")
     main_chef(user_state, cnx, Id_Pers)
+
+
+def liste_employes(user_state, cnx, Id_Pers):
+    myCursor = cnx.cursor(prepared=True)
+    # On récupère la liste des employés ayant le même job que le chef
+    queryList = "SELECT P.Nom, Pre.Prenom, P.Age FROM PERSONNE P JOIN Prenom Pre ON P.Id_Pers = Pre.Id_Pers JOIN STAFF S ON P.Id_Pers = S.Id_Pers JOIN {} J ON S.Id_staff = J.Id_staff AND P.Id_Pers != {}".format(
+        user_state, Id_Pers)
+    myCursor.execute(queryList)
+    result = myCursor.fetchall()
+    for i in result:
+        print(str(i).replace("(", "").replace(")",
+                                              "").replace("'", "").replace(",", " "))

@@ -14,10 +14,11 @@ def main_cuisinier(cnx, Id_Pers):
 
     choix = "basic"
     os.system("cls")
-    while choix not in ("Cuisiner pour un tournoi", "Cuisiner pour un emplacement", "Arrêter de cuisiner pour un emplacement", "exit", "1", "2", "3", "4"):
-        choix = input("\nQue voulez vous faire ?\n 1: Cuisinier pour un tournoi\n 2: Cuisiner pour un emplacement\n 3: Arrêter de cuisiner pour un emplacement\n 4: exit\n ")
+    while choix not in ("Cuisiner pour un tournoi", "Cuisiner pour un emplacement", "Arrêter de cuisiner pour un emplacement", "profil", "exit", "1", "2", "3", "4", "5"):
+        choix = input(
+            "\nQue voulez vous faire ?\n1: Cuisinier pour un tournoi\n2: Cuisiner pour un emplacement\n3: Arrêter de cuisiner pour un emplacement\n4 : Regarder votre profil\n5: exit\n ")
 
-    if choix == "exit" or choix == "4":
+    if choix == "exit" or choix == "5":
         print("Vous avez quitté l'application !")
         sleep(2)
         exit()
@@ -49,7 +50,8 @@ def main_cuisinier(cnx, Id_Pers):
         queryIdTournoi = "SELECT Id_tournoi FROM TOURNOI WHERE Date_tournoi = %s AND Heure = %s AND Lieu = %s"
         myCursor.execute(queryIdTournoi, (Date_tournoi, Heure, Lieu))
         Id_tournoi = myCursor.fetchall()
-        print("\nVous avez choisi de cuisiner pour le tournoi n°", Id_tournoi[0][0], " !")
+        print("\nVous avez choisi de cuisiner pour le tournoi n°",
+              Id_tournoi[0][0], " !")
 
         if Id_tournoi == []:
             print("\nCe tournoi n'existe pas !")
@@ -85,11 +87,13 @@ def main_cuisinier(cnx, Id_Pers):
                 myCursor.execute(queryAddCuisTournoi,
                                  (Id_emplacement, Id_cuis, Id_tournoi))
         cnx.commit()
+        sleep(1)
         main_cuisinier(cnx, Id_Pers)
 
     elif choix == "Cuisiner pour un emplacement" or choix == "2":
         myCursor = cnx.cursor(prepared=True)
-        bungalow = input("Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
+        bungalow = input(
+            "Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
         if bungalow == "exit":
             print("Vous avez quitté l'application")
             sleep(2)
@@ -128,7 +132,8 @@ def main_cuisinier(cnx, Id_Pers):
                 if VerifIdEmplacement == None:
                     # Si non cela veut dire que le cuisinier cuisine pour un tournoi on fait donc un update
                     queryAddCuisEmplacement = "UPDATE cuisine SET Id_emplacement = %s WHERE Id_cuis = %s"
-                    print("\nVous cuisinez pour l'emplacement n°", Id_emplacement, " !")
+                    print("\nVous cuisinez pour l'emplacement n°",
+                          Id_emplacement, " !")
                     sleep(2)
                 else:
                     # Si oui cela veut dire que le cuisinier cuisine pour un emplacement or il ne peut pas
@@ -143,12 +148,73 @@ def main_cuisinier(cnx, Id_Pers):
         queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = true"
         myCursor.execute(queryUpdateEmplacement)
         cnx.commit()
-    
+
+        sleep(1)
         main_cuisinier(cnx, Id_Pers)
 
     elif choix == "Arrêter de cuisiner pour un emplacement" or choix == "3":
         stop_emplacement(cnx, Id_Pers, Id_cuis)
+
         # ici on fait une fonction externe à main car on en aura besoin pour plus tard dans un autre fichier
+    else:
+        # On affiche les données personnelles de l'utilisateur
+        myCursor = cnx.cursor(prepared=True)
+        os.system("cls")
+        print("Voici votre profil : \n========================\n")
+        print("Données personnelles : \n=========================")
+        prenomsListe = []
+        queryPrenoms = "SELECT Prenom FROM Prenom WHERE Id_Pers = %s"
+        myCursor.execute(queryPrenoms, (Id_Pers,))
+        for prenoms in myCursor:
+            prenomsListe.append(prenoms[0])
+        myCursor.fetchall()
+
+        queryInfos = "SELECT Id_staff, Nom, Age, Salaire FROM view_Cuisinier WHERE Id_staff = %s GROUP BY Id_staff"
+        myCursor.execute(queryInfos, (Id_staff,))
+
+        for (Id_staff, Nom, Age, Salaire) in myCursor:
+            print("Id : %s\nNom : %s" % (Id_staff, Nom))
+            # On affiche les prénoms stockés dans la liste prenomsListe en ligne
+            print("Prénom(s) : %s" % (", ".join(prenomsListe)))
+            print("Age : %s\nSalaire : %s \u20ac\n" % (Age, Salaire))
+
+        # On affiche les tournois pour lesquels le cuisinier cuisine
+        queryTournois = "SELECT Id_tournoi FROM view_Cuisinier WHERE Id_staff = %s GROUP BY Id_tournoi"
+        myCursor.execute(queryTournois, (Id_staff,))
+        print("Vos tournois : \n=========================")
+        # on récupère les infos des tournois pour lequel le cuisinier cuisine
+        verif = 0
+        for Id_tournoi in myCursor.fetchall():
+            if Id_tournoi[0] == None:
+                print("Vous ne cuisinez pour aucun tournoi !\n")
+                break
+            else:
+                if verif == 1:
+                    print("\n=========================")
+                queryInfosTournoi = "SELECT Date_tournoi, Heure, Lieu, Prix FROM TOURNOI WHERE Id_tournoi = %s"
+                myCursor.execute(queryInfosTournoi, (Id_tournoi[0],))
+                for (Date_tournoi, Heure, Lieu, Prix) in myCursor:
+                    print("Date : %s\nHeure : %s\nLieu : %s\nPrix : %s\n" % (
+                        Date_tournoi, Heure, Lieu, Prix))
+            verif = 1
+        print("Votre emplacement : \n=========================")
+        # On vérifie si le cuisinier cuisine pour un emplacement
+        queryIdEmplacement = "SELECT Id_emplacement FROM view_Cuisinier WHERE Id_staff = %s GROUP BY Id_emplacement"
+        myCursor.execute(queryIdEmplacement, (Id_staff,))
+        Id_emplacement = myCursor.fetchall()[0][0]
+
+        if Id_emplacement == None:
+            print("Vous ne cuisinez pour aucun emplacement !\n")
+        else:
+            queryInfosEmplacement = "SELECT Id_emplacement, Type_emplacement, Prix, nbr_places FROM EMPLACEMENT WHERE Id_emplacement = %s"
+            myCursor.execute(queryInfosEmplacement, (Id_emplacement,))
+            for (Id_emplacement, Type_emplacement, nbr_places, Prix) in myCursor:
+                print("Id : %s\nType : %s\nNombre d'habitants : %s\nPrix : %s\n" %
+                      (Id_emplacement, Type_emplacement, nbr_places, Prix))
+        a = input("Appuyez sur entrée pour continuer...")
+        if a == "":
+            sleep(1)
+            main_cuisinier(cnx, Id_Pers)
 
 
 def stop_emplacement(cnx, Id_Pers, Id_cuis):
@@ -210,7 +276,6 @@ def stop_emplacement(cnx, Id_Pers, Id_cuis):
             else:
                 # On supprime seulement l'emplacement
                 queryDelCuis = "UPDATE cuisine SET Id_emplacement = NULL where Id_emplacement = %s"
-                
 
             myCursor.execute(
                 queryDelCuis, (Id_emplacement,))
