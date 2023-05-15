@@ -16,7 +16,7 @@ def main_client(cnx, Id_Pers):
 
     choix = "basic"
     os.system("cls")
-    while choix not in ("Reserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7", "8"):
+    while choix not in ("Réserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7", "8"):
         choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: S'inscrire à un tournoi\n 7: profil\n 8: exit\n")
         os.system("cls")
 
