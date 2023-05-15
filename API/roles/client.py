@@ -502,6 +502,7 @@ def profil(cnx, Id_Pers):
     """
     mycursor = cnx.cursor(prepared=True)
     os.system("cls")
+    # On récupère l'Id_cli
     queryIdCli = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
     mycursor.execute(queryIdCli, (Id_Pers,))
     Id_cli = mycursor.fetchall()[0][0]

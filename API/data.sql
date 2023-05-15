@@ -554,11 +554,6 @@ INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti) VALUES ('2023-07-02'
 INSERT INTO TOURNOI (Date_tournoi, Heure, Lieu, Id_acti, Prix) VALUES ('2023-07-01', '10:00', 'Terrain de basket', 1, 10);
 INSERT INTO TOURNOI (Date_tournoi, Heure, Lieu, Id_acti, Prix) VALUES ('2023-07-01', '14:00', 'Terrain de volleyball', 3, 10);
 
-INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-05-11', 10000);
-INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-06-12', 8000);
-INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2023-06-13', 11000);
-INSERT INTO FICHE_COMPTA (Date_fiche, Prix_total) VALUES ('2024-07-13', 11000);
-
 INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Ballon de foot', 'Sport', 8, 'Mitigé');
 INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Raquette de bad', 'Sport', 15, 'Mitigé');
 INSERT INTO MATERIEL (Nom, Type_mat, Prix, Etat) VALUES ('Baudrier', 'Sport', 20, 'Bon');
