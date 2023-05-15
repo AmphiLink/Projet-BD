@@ -1,3 +1,4 @@
+import os
 from time import sleep
 
 
@@ -12,14 +13,13 @@ def main_cuisinier(cnx, Id_Pers):
     """
 
     choix = "basic"
-    while choix not in ("Cuisiner pour un tournoi", "Cuisiner pour un emplacement", "Arrêter de cuisiner pour un emplacement", "profil", "exit"):
-        choix = input(
-            "Que voulez vous faire ? (Cuisinier pour un tournoi, Cuisiner pour un emplacement, Arrêter de cuisiner pour un emplacement, profil, exit)\n ")
-        sleep(1)
+    os.system("cls")
+    while choix not in ("Cuisiner pour un tournoi", "Cuisiner pour un emplacement", "Arrêter de cuisiner pour un emplacement", "exit", "1", "2", "3", "4"):
+        choix = input("\nQue voulez vous faire ?\n 1: Cuisinier pour un tournoi\n 2: Cuisiner pour un emplacement\n 3: Arrêter de cuisiner pour un emplacement\n 4: exit\n ")
 
-    if choix == "exit":
+    if choix == "exit" or choix == "4":
         print("Vous avez quitté l'application !")
-        sleep(1)
+        sleep(2)
         exit()
 
     myCursor = cnx.cursor(prepared=True)
@@ -33,25 +33,27 @@ def main_cuisinier(cnx, Id_Pers):
     myCursor.execute(queryIdCuis, (Id_staff,))
     Id_cuis = myCursor.fetchall()[0][0]
 
-    if choix == "Cuisiner pour un tournoi":
+    if choix == "Cuisiner pour un tournoi" or choix == "1":
         myCursor = cnx.cursor(prepared=True)
+        os.system("cls")
         Date_tournoi = input("Quelle est la date du tournoi ? (AAAA-MM-JJ) ")
         Heure = input("Quelle est l'heure du tournoi ? (HH:MM) ")
         Lieu = input("Quel est le lieu du tournoi ? ")
 
         if Date_tournoi == "exit" or Heure == "exit" or Lieu == "exit":
             print("Vous avez quitté l'application")
-            sleep(1)
+            sleep(2)
             exit()
 
         # On récupère l'id du tournoi en question
         queryIdTournoi = "SELECT Id_tournoi FROM TOURNOI WHERE Date_tournoi = %s AND Heure = %s AND Lieu = %s"
         myCursor.execute(queryIdTournoi, (Date_tournoi, Heure, Lieu))
         Id_tournoi = myCursor.fetchall()
+        print("\nVous avez choisi de cuisiner pour le tournoi n°", Id_tournoi[0][0], " !")
 
         if Id_tournoi == []:
-            print("Ce tournoi n'existe pas !")
-            sleep(1)
+            print("\nCe tournoi n'existe pas !")
+            sleep(2)
             main_cuisinier(cnx, Id_Pers)
         Id_tournoi = Id_tournoi[0][0]
 
@@ -85,13 +87,12 @@ def main_cuisinier(cnx, Id_Pers):
         cnx.commit()
         main_cuisinier(cnx, Id_Pers)
 
-    elif choix == "Cuisiner pour un emplacement":
+    elif choix == "Cuisiner pour un emplacement" or choix == "2":
         myCursor = cnx.cursor(prepared=True)
-        bungalow = input(
-            "Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
+        bungalow = input("Pour quel emplacement voulez-vous cuisiner (N° d'emplacement) ? ")
         if bungalow == "exit":
             print("Vous avez quitté l'application")
-            sleep(1)
+            sleep(2)
             exit()
 
         # On récupère l'id de l'emplacement en question
@@ -106,6 +107,8 @@ def main_cuisinier(cnx, Id_Pers):
         if VerifIdCuis == []:
             # Si non pas de souci à se faire on insère les données
             queryAddCuisEmplacement = "INSERT INTO cuisine (Id_cuis, Id_emplacement) VALUES(%s, %s)"
+            print("\nVous cuisinez pour l'emplacement n°", Id_emplacement, " !")
+            sleep(2)
         else:
             # Si oui il faut vérifier si ce cuisininier cuisine pour des tournois
             query = "SELECT Id_tournoi FROM cuisine WHERE Id_cuis = %s"
@@ -114,8 +117,8 @@ def main_cuisinier(cnx, Id_Pers):
 
             if VerifIdTournoi == None:
                 # Si non cela veut dire que le cuisinier cuisine pour un emplacement or il ne peut pas
-                print("Vous cuisinez déjà pour un emplacement !")
-                sleep(1)
+                print("\nVous cuisinez déjà pour un emplacement !")
+                sleep(2)
                 main_cuisinier(cnx, Id_Pers)
             else:
                 # On vérifie quand même si le cuisinier cuisine pour un emplacement
@@ -125,10 +128,12 @@ def main_cuisinier(cnx, Id_Pers):
                 if VerifIdEmplacement == None:
                     # Si non cela veut dire que le cuisinier cuisine pour un tournoi on fait donc un update
                     queryAddCuisEmplacement = "UPDATE cuisine SET Id_emplacement = %s WHERE Id_cuis = %s"
+                    print("\nVous cuisinez pour l'emplacement n°", Id_emplacement, " !")
+                    sleep(2)
                 else:
                     # Si oui cela veut dire que le cuisinier cuisine pour un emplacement or il ne peut pas
-                    print("Vous cuisinez déjà pour un emplacement !")
-                    sleep(1)
+                    print("\nVous cuisinez déjà pour un emplacement !")
+                    sleep(2)
                     main_cuisinier(cnx, Id_Pers)
         myCursor.execute(queryAddCuisEmplacement,
                          (Id_emplacement, Id_cuis))
@@ -138,9 +143,10 @@ def main_cuisinier(cnx, Id_Pers):
         queryUpdateEmplacement = "UPDATE EMPLACEMENT SET Cuisinier = true"
         myCursor.execute(queryUpdateEmplacement)
         cnx.commit()
+    
         main_cuisinier(cnx, Id_Pers)
 
-    elif choix == "Arrêter de cuisiner pour un emplacement":
+    elif choix == "Arrêter de cuisiner pour un emplacement" or choix == "3":
         stop_emplacement(cnx, Id_Pers, Id_cuis)
         # ici on fait une fonction externe à main car on en aura besoin pour plus tard dans un autre fichier
 
@@ -171,7 +177,7 @@ def stop_emplacement(cnx, Id_Pers, Id_cuis):
             print("Vous ne travaillez pour aucun emplacement !")
             main_cuisinier(cnx, Id_Pers)
         else:
-            print("Veuillez vérifier votre profil afin de regarder le numéro d'identification de l'emplacement pour lequel vous travaillez")
+            print("\nVeuillez vérifier votre profil afin de regarder le numéro d'identification de l'emplacement pour lequel vous travaillez")
             Id_emplacement = input(
                 "Saisissez le numéro du bungalow pour lequel vous arrêtez de cuisiner ")
 
@@ -179,7 +185,7 @@ def stop_emplacement(cnx, Id_Pers, Id_cuis):
             Id_emplacement = int(Id_emplacement)
             if Id_emplacement == "exit":
                 print("Vous avez quitté l'application")
-                sleep(1)
+                sleep(2)
                 exit()
 
             # On vérifie si l'Id_emplacement existe bien
@@ -204,6 +210,7 @@ def stop_emplacement(cnx, Id_Pers, Id_cuis):
             else:
                 # On supprime seulement l'emplacement
                 queryDelCuis = "UPDATE cuisine SET Id_emplacement = NULL where Id_emplacement = %s"
+                
 
             myCursor.execute(
                 queryDelCuis, (Id_emplacement,))
@@ -215,7 +222,9 @@ def stop_emplacement(cnx, Id_Pers, Id_cuis):
             cnx.commit()
             print(
                 "Vous avez arrêté de cuisiner pour cet emplacement et le statut de l'emplacement a été mis à jour")
+            sleep(3)
             main_cuisinier(cnx, Id_Pers)
     else:
         print("Vous ne travaillez pour aucun emplacement !")
+        sleep(2)
         main_cuisinier(cnx, Id_Pers)

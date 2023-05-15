@@ -1,6 +1,8 @@
 import os
 from time import sleep
 
+from roles.client import profil
+
 
 def main_technicien(cnx, Id_Pers):
     """
@@ -13,12 +15,12 @@ def main_technicien(cnx, Id_Pers):
     """
     choix = "basic"
     os.system("cls")
-    while choix not in ("Nettoyer un secteur", "profil", "exit", "1", "2", "3"):
+    while choix not in ("Nettoyer un secteur", "exit", "1", "2"):
         choix = input(
-            "\nQue voulez vous faire ?\n (1: Nettoyer un secteur, 2: profil, 3: exit)\n ")
+            "\nQue voulez vous faire ?\n 1: Nettoyer un secteur\n 2: exit\n ")
         os.system("cls")
 
-    if choix == "exit" or choix == "3":
+    if choix == "exit" or choix == "2":
         print("Vous avez quitté l'application !")
         sleep(1)
         exit()
@@ -37,9 +39,11 @@ def main_technicien(cnx, Id_Pers):
     if choix == "Nettoyer un secteur" or choix == "1":
         list_secteur(cnx)
         myCursor = cnx.cursor(prepared=True)
-        Id_secteur = input("\nQuel secteur voulez vous nettoyer ? ")
-        Heure = input("Quelle est l'heure du nettoyage ? (HH:MM) ")
-        Date = input("Quelle est la date du nettoyage ? (AAAA-MM-JJ) ")
+        Id_secteur = input("\nQuel secteur voulez vous nettoyer ?\n")
+        if Id_secteur == "back":
+            main_technicien(cnx, Id_Pers)
+        Heure = input("Quelle est l'heure du nettoyage ? (HH:MM)\n")
+        Date = input("Quelle est la date du nettoyage ? (AAAA-MM-JJ)\n")
 
         if Id_secteur == "exit" or Heure == "exit" or Date == "exit":
             print("Vous avez quitté l'application")
@@ -57,6 +61,7 @@ def main_technicien(cnx, Id_Pers):
                          (Id_tech, Date, Heure, Id_secteur))
         cnx.commit()
         print("\nVous pouvez aller nettoyer ce secteur !")
+        sleep(2)
         main_technicien(cnx, Id_Pers)
 
 
@@ -76,4 +81,4 @@ def list_secteur(cnx):
     listSecteur = myCursor.fetchall()
     print("Voici la liste des secteurs : ")
     for secteur in listSecteur:
-        print(secteur[0], ": ", secteur[1])
+        print(secteur[0], ":", secteur[1])

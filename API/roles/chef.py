@@ -18,21 +18,31 @@ def main_chef(user_state, cnx, Id_Pers):
     """
 
     choix = "basic"
-    while choix not in ("liste_employees", "supprimer_employee", "rajouter_employee", "profil", "exit"):
+    while choix not in ("liste_employees", "supprimer_employee", "rajouter_employee", "exit", "1", "2", "3", "4"):
+        os.system("cls")
         choix = input(
-            "Que voulez vous faire ? (liste_employees, supprimer_employee, rajouter_employee, profil, exit) ")
+            "\nQue voulez vous faire ?\n 1: Liste des employés\n 2: Supprimer un employé\n 3: Rajouter un employé\n 4: exit\n")
         sleep(1)
 
     myCursor = cnx.cursor(prepared=True)
-    if choix == "liste_employees":
-        # On récupère la liste des employés ayant le même job que le chef
-        queryList = "SELECT P.Nom, Pre.Prenom, P.Age FROM PERSONNE P JOIN Prenom Pre ON P.Id_Pers = Pre.Id_Pers JOIN STAFF S ON P.Id_Pers = S.Id_Pers JOIN {} J ON S.Id_staff = J.Id_staff".format(
-            user_state)
-        myCursor.execute(queryList)
-        print(myCursor.fetchall())
-        sleep(5)
+    if choix == "exit" or choix == "5":
+        print("Vous avez quitté l'application !")
+        sleep(1)
+        exit()
 
-    elif choix == "rajouter_employee":
+    if choix == "liste_employees" or choix == "1":
+        # On récupère la liste des employés ayant le même job que le chef
+        queryList = "SELECT P.Nom, Pre.Prenom, P.Age FROM PERSONNE P JOIN Prenom Pre ON P.Id_Pers = Pre.Id_Pers JOIN STAFF S ON P.Id_Pers = S.Id_Pers JOIN {} J ON S.Id_staff = J.Id_staff".format(user_state)
+        myCursor.execute(queryList)
+        result = myCursor.fetchall()
+        os.system("cls")
+        print("Voici la liste des employés : ")
+        for i in result:
+            print(str(i).replace("(", "").replace(")", "").replace("'", "").replace(",", " "))
+        sleep(4)
+        
+
+    elif choix == "rajouter_employee" or choix == "3":
         nom = input("Nom de l'employé : ")
         prenom = input("Prénom de l'employé : ")
         prenomsListe = prenom.split(" ")
@@ -74,7 +84,7 @@ def main_chef(user_state, cnx, Id_Pers):
             cnx.commit()
         print("L'employé a bien été ajouté !")
 
-    elif choix == "supprimer_employee":
+    elif choix == "supprimer_employee" or choix == "2":
         nom = input("Nom de l'employé : ")
         age = input("Age de l'employé : ")
 
