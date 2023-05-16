@@ -680,7 +680,7 @@ BEGIN
           where new.Id_type_acti in(
                select Id_type_acti
                from peut_faire p
-               where new.Id_anim = p.Id_anim 
+               where new.Id_anim = p.Id_anim;
      )))then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "L'animateur n'a pas les compétences requises."
      end if;
 END;
@@ -699,70 +699,101 @@ begin
         select Age
         from PERSONNE P, CLIENT C, inscription I
         where new.I.id_cli = C.id_cli
-        and C.id_pers = P.id_pers 
+        and C.id_pers = P.id_pers; 
         ) <
         (--age min
         select Age_min
         from TYPE_ACTI T, ACTIVITE A, inscription I 
         where new.I.id_acti = A.id_acti
-        and A.Id_type_acti = T.Id_type_acti
+        and A.Id_type_acti = T.Id_type_acti;
         )
     ) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "La personne na pas l'âge minimum requis.";
     end if;
 end;
 
 
+
 create trigger CHEF_UNIQUE_PAR_SECTION
 before update, insert on STAFF
 for each row
---declare
-when (new.Prix_chef <> null)
+when (new.Prix_chef <> null) --Nouveau chef
 begin
-    if( 
-        ((new.CUISINIER <> null) 
-        and 
-        (1 = ( 
+     if(
+          (1 = 
+          ( 
           select
-               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
-          from(
-          select * 
-          from STAFF 
-          where Prix_chef <> null 
-          and CUISINIER <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
-    ELSEIF( 
-        ((new.TECHNICIEN <> null) 
-        and 
-        (1 = ( 
+               (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as is_that_type
+          from STAFF S, TECHNICIEN T
+          where new.id_staff = T.Id_staff
+          )) --Fais partie de ce type de staff
+          
+          and -- verifier si déjà un chef dans ce secteur
+          (1 = (
+               select
+                    (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as already_one
+               from STAFF S, TECHNICIEN T
+               where S.id_staff = T.id_staff
+               and S.Prix_chef <> null;
+          ))
+          )then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
+     
+     ELSEIF(
+          (1 = 
+          ( 
           select
-               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
-          from(
-          select * 
-          from STAFF 
-          where Prix_chef <> null 
-          and TECHNICIEN <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
-    ELSEIF( 
-        ((new.ANIMATEUR <> null) 
-        and 
-        (1 = ( 
+               (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as is_that_type
+          from STAFF S, CUISINIER T
+          where new.id_staff = T.Id_staff
+          )) --Fais partie de ce type de staff
+          
+          and -- verifier si déjà un chef dans ce secteur
+          (1 = (
+               select
+                    (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as already_one
+               from STAFF S, CUISINIER T
+               where S.id_staff = T.id_staff
+               and S.Prix_chef <> null;
+          ))
+          )then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
+     
+     ELSEIF(
+          (1 = 
+          ( 
           select
-               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
-          from(
-          select * 
-          from STAFF 
-          where Prix_chef <> null 
-          and ANIMATEUR <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
-    ELSEIF( 
-        ((new.ADMINISTRATION <> null) 
-        and 
-        (1 = ( 
+               (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as is_that_type
+          from STAFF S, ANIMATEUR T
+          where new.id_staff = T.Id_staff
+          )) --Fais partie de ce type de staff
+          
+          and -- verifier si déjà un chef dans ce secteur
+          (1 = (
+               select
+                    (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as already_one
+               from STAFF S, ANIMATEUR T
+               where S.id_staff = T.id_staff
+               and S.Prix_chef <> null;
+          ))
+          )then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
+     
+
+     if(
+          (1 = 
+          ( 
           select
-               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
-          from(
-          select * 
-          from STAFF 
-          where Prix_chef <> null 
-          and ADMINISTRATION <> null)))))then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
-    end if;
+               (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as is_that_type
+          from STAFF S, ADMINISTRATION T
+          where new.id_staff = T.Id_staff
+          )) --Fais partie de ce type de staff
+          
+          and -- verifier si déjà un chef dans ce secteur
+          (1 = (
+               select
+                    (case when COUNT(*) > 0 THEN 1 ELSE 0 END) as already_one
+               from STAFF S, ADMINISTRATION T
+               where S.id_staff = T.id_staff
+               and S.Prix_chef <> null;
+          ))
+          )then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
+     
+     end if;
 end;
-
-
