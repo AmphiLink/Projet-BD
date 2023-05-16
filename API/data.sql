@@ -666,29 +666,23 @@ select Id_staff, Prix as "Salaire"
 from STAFF
 where Prix_chef is null;
 
+
 -- Trigger Section
 
 CREATE TRIGGER COMP_ACTI_ANIM
 BEFORE INSERT ON ACTIVITE
 FOR EACH ROW
 BEGIN
-    -- Déclaration de la variable
-    DECLARE N INTEGER;
-    
-    -- Calcul du nombre de moniteurs compétents pour la nouvelle activité
-    SELECT COUNT(*) INTO N
-    FROM peut_faire P
-    WHERE P.id_type_acti = NEW.id_type_acti
-    AND P.id_anim IN (
-        SELECT id_anim
-        FROM ANIMATEUR
-    );
-
-    -- Vérification si au moins un moniteur est compétent
-    IF N = 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Le moniteur n''a pas les compétences requises.';
-    END IF;
+   if (
+     not exists(
+          select 1
+          from ACTIVITE A, peut_faire p, ANIMATEUR N
+          where new.Id_type_acti in(
+               select Id_type_acti
+               from peut_faire p
+               where new.Id_anim = p.Id_anim 
+     )))then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "L'animateur n'a pas les compétences requises."
+     end if;
 END;
 
 
@@ -713,7 +707,7 @@ begin
         where new.I.id_acti = A.id_acti
         and A.Id_type_acti = T.Id_type_acti
         )
-    ) then raise exception "La personne na pas l'âge minimum requis.";
+    ) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "La personne na pas l'âge minimum requis.";
     end if;
 end;
 
@@ -722,32 +716,52 @@ create trigger CHEF_UNIQUE_PAR_SECTION
 before update, insert on STAFF
 for each row
 --declare
-when (new.Prix_chef != null)
+when (new.Prix_chef <> null)
 begin
     if( 
-        ((new.CUISINIER != null) and 
-        (   select * 
-            from STAFF 
-            where Prix_chef != null 
-            and CUISINIER != null)!= null)) then raise exception "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
-    else if(
-        ((new.TECHNICIEN != null) and 
-        (   select * 
-            from STAFF 
-            where Prix_chef != null 
-            and TECHNICIEN != null)!= null)) then raise exception "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
-    else if(
-       ((new.ANIMATEUR != null) and 
-        (   select * 
-            from STAFF 
-            where Prix_chef != null 
-            and ANIMATEUR != null)!= null)) then raise exception "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
-    else if(
-        ((new.ADMINITRATION != null) and 
-        (   select * 
-            from STAFF 
-            where Prix_chef != null 
-            and ADMINITRATION != null)!= null)) then raise exception "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
+        ((new.CUISINIER <> null) 
+        and 
+        (1 = ( 
+          select
+               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
+          from(
+          select * 
+          from STAFF 
+          where Prix_chef <> null 
+          and CUISINIER <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
+    ELSEIF( 
+        ((new.TECHNICIEN <> null) 
+        and 
+        (1 = ( 
+          select
+               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
+          from(
+          select * 
+          from STAFF 
+          where Prix_chef <> null 
+          and TECHNICIEN <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
+    ELSEIF( 
+        ((new.ANIMATEUR <> null) 
+        and 
+        (1 = ( 
+          select
+               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
+          from(
+          select * 
+          from STAFF 
+          where Prix_chef <> null 
+          and ANIMATEUR <> null))))) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
+    ELSEIF( 
+        ((new.ADMINISTRATION <> null) 
+        and 
+        (1 = ( 
+          select
+               (case when COUNT(*) > 0 THEN 0 ELSE 1 END) as is_empty
+          from(
+          select * 
+          from STAFF 
+          where Prix_chef <> null 
+          and ADMINISTRATION <> null)))))then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
     end if;
 end;
 
