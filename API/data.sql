@@ -817,3 +817,31 @@ begin
      
      end if;
 end;
+
+CREATE TRIGGER CHEF_UNIQUE_PAR_SECTION_2
+BEFORE UPDATE ON STAFF
+FOR EACH ROW
+when (new.Prix_chef IS NOT NULL)
+BEGIN
+        IF (
+            (SELECT COUNT(*) FROM STAFF S, TECHNICIEN T WHERE new.id_staff = T.Id_staff) = 1
+            AND (SELECT COUNT(*) FROM STAFF S, TECHNICIEN T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) >0
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les techniciens, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, CUISINIER T WHERE new.id_staff = T.Id_staff) = 1
+            AND (SELECT COUNT(*) FROM STAFF S, CUISINIER T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) >0
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les cuisiniers, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, ANIMATEUR T WHERE new.id_staff = T.Id_staff) = 1
+            AND (SELECT COUNT(*) FROM STAFF S, ANIMATEUR T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) = 1
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les animateurs, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, ADMINISTRATION T WHERE new.id_staff = T.Id_staff) = 1
+            AND (SELECT COUNT(*) FROM STAFF S, ADMINISTRATION T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) >0
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour l''administration, plus possible d''en insérer.';
+        END IF;
+END;
