@@ -1,6 +1,6 @@
 import os
 from time import sleep
-
+import mysql.connector
 from roles.animateur import liste_activités
 
 
@@ -369,11 +369,17 @@ def inscrire_activite(cnx, Id_Pers):
             query = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
             mycursor.execute(query, (Id_Pers,))
             Id_cli = mycursor.fetchall()[0][0]
-            query = "INSERT INTO inscription (Id_cli, Id_acti) VALUES (%s, %s)"
-            mycursor.execute(query, (Id_cli, activity_id))
-        cnx.commit()
-        print("Vous êtes bien inscrit à l'activité !")
-        sleep(1)
+            try:
+                query = "INSERT INTO inscription (Id_cli, Id_acti) VALUES (%s, %s)"
+                mycursor.execute(query, (Id_cli, activity_id))
+                cnx.commit()
+                print("Vous êtes bien inscrit.e à l'activité !")
+                sleep(2)
+            except mysql.connector.Error as err:
+                # Récupérez le code d'erreur et le message
+                error_message = err.msg
+                print("{}".format(error_message))
+                sleep(2)
         main_client(cnx, Id_Pers)
 
 

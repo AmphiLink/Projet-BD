@@ -670,7 +670,7 @@ where Prix_chef is null;
 -- Trigger Section
 
 CREATE TRIGGER COMP_ACTI_ANIM
-BEFORE INSERT ON ACTIVITE
+BEFORE UPDATE ON ACTIVITE
 FOR EACH ROW
 BEGIN
    if (
@@ -680,40 +680,60 @@ BEGIN
           where new.Id_type_acti in(
                select Id_type_acti
                from peut_faire p
-               where new.Id_anim = p.Id_anim;
-     )))then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "L'animateur n'a pas les compétences requises."
+               where new.Id_anim = p.Id_anim
+          ))
+     )then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Vous n''avez pas les compétences requises.';
      end if;
 END;
 
+CREATE TRIGGER AGE_MIN
+BEFORE INSERT ON inscription
+FOR EACH ROW
+BEGIN
+   IF (
+     (
+        SELECT Age
+        FROM PERSONNE P, CLIENT C
+        WHERE new.id_cli = C.id_cli
+        AND C.id_pers = P.id_pers
+     ) <
+     (
+        SELECT Age_min
+        FROM TYPE_ACTI T, ACTIVITE A
+        WHERE new.id_acti = A.id_acti
+        AND A.Id_type_acti = T.Id_type_acti
+     )
+   ) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La personne n''a pas l''âge minimum requis.';
+   END IF;
+END;
 
 
+CREATE TRIGGER CHEF_UNIQUE_PAR_SECTION
+BEFORE UPDATE ON STAFF
+FOR EACH ROW
+BEGIN
+    IF (new.Prix_chef IS NOT NULL) THEN
+        IF (
+            (SELECT COUNT(*) FROM STAFF S, TECHNICIEN T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) = 1
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les techniciens, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, CUISINIER T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) = 1
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les cuisiniers, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, ANIMATEUR T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) = 1
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour les animateurs, plus possible d''en insérer.';
+        ELSEIF (
+            (SELECT COUNT(*) FROM STAFF S, ADMINISTRATION T WHERE S.id_staff = T.id_staff AND S.Prix_chef IS NOT NULL) = 1
+        ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Il y a déjà un chef pour l''administration, plus possible d''en insérer.';
+        END IF;
+    END IF;
+END;
 
-create trigger AGE_MIN
-before insert on inscription
-for each row
---declare 
---when
-begin 
-    if(
-        (--age personnne
-        select Age
-        from PERSONNE P, CLIENT C, inscription I
-        where new.I.id_cli = C.id_cli
-        and C.id_pers = P.id_pers; 
-        ) <
-        (--age min
-        select Age_min
-        from TYPE_ACTI T, ACTIVITE A, inscription I 
-        where new.I.id_acti = A.id_acti
-        and A.Id_type_acti = T.Id_type_acti;
-        )
-    ) then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT "La personne na pas l'âge minimum requis.";
-    end if;
-end;
-
-
-
-create trigger CHEF_UNIQUE_PAR_SECTION_1
+create trigger CHEF_UNIQUE_PAR_SECTION
 before update, insert on STAFF
 for each row
 when (new.Prix_chef is not null) --Nouveau chef
@@ -797,52 +817,3 @@ begin
      
      end if;
 end;
-*/
-
-CREATE TRIGGER CHEF_UNIQUE_PAR_SECTION_2
-BEFORE UPDATE ON STAFF
-FOR EACH ROW
-when (new.Prix_chef is not null)
-BEGIN
-        IF (
-            (SELECT COUNT(*) 
-            FROM STAFF S, TECHNICIEN T 
-            WHERE new.id_staff = T.Id_staff) = 1
-            AND 
-            (SELECT COUNT(*) 
-            FROM STAFF S, TECHNICIEN T 
-            WHERE S.id_staff = T.id_staff 
-            AND S.Prix_chef IS NOT NULL) > 0
-        ) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Il y a déjà un chef pour les techniciens, plus possible d'en insérer.";
-        ELSEIF (
-            (SELECT COUNT(*) 
-            FROM STAFF S, CUISINIER T 
-            WHERE new.id_staff = T.Id_staff) = 1
-            AND 
-            (SELECT COUNT(*) 
-            FROM STAFF S, CUISINIER T 
-            WHERE S.id_staff = T.id_staff 
-            AND S.Prix_chef IS NOT NULL) > 0
-        ) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Il y a déjà un chef pour les cuisiniers, plus possible d'en insérer.";
-        ELSEIF (
-            (SELECT 
-            COUNT(*) 
-            FROM STAFF S, ANIMATEUR T 
-            WHERE new.id_staff = T.Id_staff) = 1
-            AND 
-            (SELECT COUNT(*) 
-            FROM STAFF S, ANIMATEUR T 
-            WHERE S.id_staff = T.id_staff 
-            AND S.Prix_chef IS NOT NULL) > 0
-        ) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Il y a déjà un chef pour les animateurs, plus possible d'en insérer.";
-        ELSEIF (
-            (SELECT COUNT(*) FROM STAFF S, ADMINISTRATION T 
-            WHERE new.id_staff = T.Id_staff) = 1
-            AND 
-            (SELECT COUNT(*) FROM STAFF S, ADMINISTRATION T 
-            WHERE S.id_staff = T.id_staff 
-            AND S.Prix_chef IS NOT NULL) > 0 
-        ) THEN
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Il y a déjà un chef pour l'administration, plus possible d'en insérer.";
-        END IF;
-END;
