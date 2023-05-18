@@ -88,7 +88,7 @@ def login(cnx, Authorized):
         if test == []:
             print("Mauvais nom ou mauvais age. Veuillez réessayer")
             Authorized = False
-            login(cnx, Authorized)
+            return login(cnx, Authorized)
 
         myCursor = cnx.cursor(prepared=True)
         queryLogin = "SELECT Mot_de_passe FROM PERSONNE WHERE Nom = %s AND Age = %s"
@@ -200,13 +200,13 @@ def register(cnx):
     # on récupère l'id du client que l'on vient de créer
     queryId = "SELECT Id_Pers FROM PERSONNE WHERE Nom = %s AND  Age = %s AND Mot_de_passe = %s"
     myCursor.execute(queryId, (UserName, int(UserAge), HashToSend))
-    myCursor.fetchall()
+    Id_Pers = myCursor.fetchall()[0][0]
 
     MyCursorName = cnx.cursor(prepared=True)
     # On insère tous les prénoms du Client dans la table Prenom
     for name in UserSurnameList:
         querySurname = "INSERT INTO Prenom (Id_Pers, Prenom) VALUES(%s, %s)"
-        MyCursorName.execute(querySurname, (myCursor.lastrowid, name))
+        MyCursorName.execute(querySurname, (Id_Pers, name))
         cnx.commit()
 
     # On le met dans la table client
@@ -215,7 +215,7 @@ def register(cnx):
 
     # Ou dans la table STAFF
     else:
-        staffRegister(cnx, myCursor)
+        staffRegister(cnx, myCursor, Id_Pers)
 
 
 def userRegister(cnx, myCursor):
@@ -244,7 +244,7 @@ def userRegister(cnx, myCursor):
     main_auth(cnx)
 
 
-def staffRegister(cnx, myCursor):
+def staffRegister(cnx, myCursor, Id_Pers):
     """
     Permet à un staff d'enregistrer ses informations suplémentaires.
 
@@ -263,17 +263,17 @@ def staffRegister(cnx, myCursor):
     UserPrice = staffPrice(UserJob)
     # On rajoute un staff
     queryStaff = "INSERT INTO STAFF (Id_Pers, Prix) VALUES(%s, %s)"
-    myCursor.execute(queryStaff, (myCursor.lastrowid, UserPrice))
+    myCursor.execute(queryStaff, (Id_Pers, UserPrice))
     cnx.commit()
 
     # On récupère l'id du staff que l'on vient de créer
-    queryIdStaff = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
-    myCursor.execute(queryIdStaff, (myCursor.lastrowid,))
-    myCursor.fetchall()
+    queryId = "SELECT Id_staff FROM STAFF WHERE Id_Pers = %s"
+    myCursor.execute(queryId, (Id_Pers,))
+    Id_Staff = myCursor.fetchall()[0][0]
 
     # On le met dans la table correspondant à son métier
     queryJob = "INSERT INTO {} (Id_staff) VALUES({})".format(
-        UserJob, myCursor.lastrowid)
+        UserJob, Id_Staff)
     myCursor.execute(queryJob)
     cnx.commit()
 
@@ -282,7 +282,7 @@ def staffRegister(cnx, myCursor):
         chefStaff = input("Etes-vous chef ? (O/N) ")
         if chefStaff == "O":
             queryChef = "UPDATE STAFF SET Prix_chef = 1000 WHERE Id_staff = %s"
-            myCursor.execute(queryChef, (myCursor.lastrowid,))
+            myCursor.execute(queryChef, (Id_Staff,))
             cnx.commit()
 
     print("\nVous êtes enregistré en tant que staff ! Nous allons maintenant vous rediriger pour que vous puissiez vous connecter où réenregistrer un compte\n")

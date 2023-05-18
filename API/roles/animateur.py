@@ -1,5 +1,6 @@
 from time import sleep
 import os
+import mysql.connector
 
 
 def main_animateur(cnx, Id_Pers):
@@ -11,7 +12,7 @@ def main_animateur(cnx, Id_Pers):
     cnx : mysql.connector.connection.MySQLConnection (Object)
     Id_Pers : l'Id de la personne conectée (int)
     """
-
+    os.system("cls")
     choix = "basic"
     while choix not in ("liste_activités", "rajouter une compétence", "rajouter une animation", "gérer une animation", "profil", "exit", "1", "2", "3", "4", "5", "6"):
         choix = input(
@@ -67,10 +68,11 @@ def main_animateur(cnx, Id_Pers):
             sleep(1)
             exit()
         # On insère les donnees
-        # C'est également ici que se déclenchera notre trigger si l'animateur n'est pas en capacité d'animer l'activité
         queryAddActi = "INSERT INTO ACTIVITE (Date_acti, Heure, Lieu, Id_type_acti, Id_anim) VALUES (%s, %s, %s, %s, %s)"
         myCursor.execute(queryAddActi, (Date_acti, Heure,
                          Lieu, Id_type_acti, Id_anim))
+        print("Compétence ajoutée !")
+        sleep(2)
         main_animateur(cnx, Id_Pers)
 
     elif choix == "gérer une animation " or choix == "4":
@@ -94,13 +96,22 @@ def main_animateur(cnx, Id_Pers):
             ActiGestion = int(ActiGestion)
 
         # On rajoute l'Id_anim dans la table ACTIVITE
-        queryUpdate = "UPDATE ACTIVITE SET Id_anim = %s WHERE Id_acti = %s"
-        myCursor.execute(queryUpdate, (Id_anim, ActiGestion))
-        cnx.commit()
+        try:
+            queryUpdate = "UPDATE ACTIVITE SET Id_anim = %s WHERE Id_acti = %s"
+            myCursor.execute(queryUpdate, (Id_anim, ActiGestion))
+            cnx.commit()
+            print("Animation rajoutée !")
+            sleep(2)
+        except mysql.connector.Error as err:
+            # Récupérez le code d'erreur et le message
+            error_message = err.msg
+            print("{}".format(error_message))
+            sleep(2)
         main_animateur(cnx, Id_Pers)
 
     elif choix == "profil" or choix == "5":
         myCursor = cnx.cursor(prepared=True)
+        os.system("cls")
         print("Voici votre profil : \n========================\n")
         print("Données personnelles : \n=========================")
         prenomsListe = []
