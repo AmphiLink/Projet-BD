@@ -51,6 +51,7 @@ def main_animateur(cnx, Id_Pers):
         myCursor.execute(queryAdd, (Id_anim, NewJob))
         cnx.commit()
         print("Compétence ajoutée !")
+        sleep(2)
         main_animateur(cnx, Id_Pers)
 
     elif choix == "rajouter une animation" or choix == "3":
