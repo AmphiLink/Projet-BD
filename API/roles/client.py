@@ -16,8 +16,8 @@ def main_client(cnx, Id_Pers):
 
     choix = "basic"
     os.system("cls")
-    while choix not in ("Réserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7", "8"):
-        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: S'inscrire à un tournoi\n 7: profil\n 8: exit\n")
+    while choix not in ("Réserver du matériel", "Louer un emplacement", "Rejoindre/Créer une équipe", "Voir la liste des activités", "S'inscrire à une activité", "S'inscrire à un tournoi" "profil", "exit", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
+        choix = input("\nQue voulez vous faire ?\n 1: Reservé du matériel\n 2: Loué un emplacement\n 3: Rejoindre/Créer une équipe\n 4: Voir la liste des activités\n 5: S'inscrire à une activité\n 6: S'inscrire à un tournoi\n 7: profil\n 8: Vous désinscrire\n 9: exit\n")
         os.system("cls")
 
     myCursor = cnx.cursor(prepared=True)
@@ -51,10 +51,12 @@ def main_client(cnx, Id_Pers):
     elif choix == "profil" or choix == "7":
         profil(cnx, Id_Pers)
 
-    elif choix == "exit" or choix == "8":
+    elif choix == "exit" or choix == "9":
         print("Vous avez quitté l'application !")
         sleep(1)
         exit()
+    elif choix == "Vous désinscrire" or choix == "8":
+        desinscription(cnx, Id_Pers)
 
 
 def reserve_mat(cnx, Id_Pers, Id_client):
@@ -664,3 +666,72 @@ def profil(cnx, Id_Pers):
         print("Vous avez quitté l'application")
         sleep(1)
         exit()
+
+
+def desinscription(cnx, Id_Pers):
+    # On récupère l'Id du client
+    myCursor = cnx.cursor()
+    queryIdCli = "SELECT Id_cli FROM CLIENT WHERE Id_Pers = %s"
+    myCursor.execute(queryIdCli, (Id_Pers,))
+    Id_cli = myCursor.fetchall()[0][0]
+
+    # On vérifie que le client n'a pas de réservation en cours
+
+    queryVerifResa = "SELECT Id_cli FROM loue_emplacement WHERE Id_cli = %s"
+    myCursor.execute(queryVerifResa, (Id_cli,))
+
+    if myCursor.fetchall() != []:
+        # On update la date de fin de location à aujourd'hui
+        queryUpdateDateFin = "UPDATE loue_emplacement SET Date_fin = CURDATE() WHERE Id_cli = %s"
+        myCursor.execute(queryUpdateDateFin, (Id_cli,))
+        cnx.commit()
+
+    # On supprime l'équipe dont la personne fait partie
+    # D'abord on récupère son Id_equipe
+    queryGetIdEquipe = "SELECT Id_equipe FROM CLIENT WHERE Id_cli = %s"
+    myCursor.execute(queryGetIdEquipe, (Id_cli,))
+    Id_equipe = myCursor.fetchall()[0][0]
+
+    if Id_equipe != None:
+
+        # On vérifie si l'équipe est inscrite à un tournoi
+        queryVerifTournoi = "SELECT Id_equipe FROM participe WHERE Id_equipe = %s"
+        myCursor.execute(queryVerifTournoi, (Id_equipe,))
+
+        if myCursor.fetchall() != []:
+            # On supprime l'équipe du tournoi
+            queryDeleteTournoi = "DELETE FROM participe WHERE Id_equipe = %s"
+            myCursor.execute(queryDeleteTournoi, (Id_equipe,))
+            cnx.commit()
+
+        # On update tout sauf Id_cli et Id_pers à NULL
+        querydeleteInfos = "UPDATE CLIENT SET Pays = 'Anonimized', Code_postal = -1, Con_Telephone = -1, Con_Email = 'Anonimized', Ville = 'Anonimized', Numero_de_maison = -1, Id_equipe = Null WHERE Id_cli = %s"
+        myCursor.execute(querydeleteInfos, (Id_cli,))
+        cnx.commit()
+
+        # On supprime l'équipe
+        queryDeleteEquipe = "DELETE FROM EQUIPE WHERE Id_equipe = %s"
+        myCursor.execute(queryDeleteEquipe, (Id_equipe,))
+    else:
+        querydeleteInfos = "UPDATE CLIENT SET Pays = 'Anonimized', Code_postal = -1, Con_Telephone = -1, Con_Email = 'Anonimized', Ville = 'Anonimized', Numero_de_maison = -1 WHERE Id_cli = %s"
+        myCursor.execute(querydeleteInfos, (Id_cli,))
+
+    cnx.commit()
+
+    queryIdPers = "SELECT Id_pers FROM CLIENT WHERE Id_cli = %s"
+    myCursor.execute(queryIdPers, (Id_cli,))
+    Id_Pers = myCursor.fetchall()[0][0]
+    # On supprime le client de la table PERSONNE donc tout sauf Id_pers à NULL
+    querydeleteClient = "UPDATE PERSONNE SET Nom = 'Anonimized', Age = -1, Mot_de_passe = 'Anonimized' WHERE Id_Pers = %s"
+    myCursor.execute(querydeleteClient, (Id_Pers,))
+    cnx.commit()
+
+    # On supprime le client de la table PRENOM donc tout sauf Id_pers à NULL
+    querydeletePrenom = "UPDATE Prenom SET Prenom = 'Anonimized' WHERE Id_Pers = %s"
+    myCursor.execute(querydeletePrenom, (Id_Pers,))
+    cnx.commit()
+
+    print("Désistription réussie !")
+    print("Heureux de vous avoir eu parmi nous !\n Revenez quand vous voulez !")
+    sleep(2)
+    exit()
